@@ -3,7 +3,11 @@
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { BRIEF_FIELD_HINTS } from "@/lib/brief-fields";
+import {
+  BriefFormField,
+  BriefLessonsField,
+  BriefSubjectField,
+} from "@/components/brief-field";
 import {
   activateCourse,
   enrollStudents,
@@ -14,7 +18,6 @@ import {
   updateCourse,
 } from "@/lib/api";
 import type { Course, EnrollmentRow } from "@/lib/schemas";
-import { SUBJECT_OPTIONS } from "@/lib/subjects";
 
 type Tab = "brief" | "roster";
 
@@ -140,8 +143,9 @@ export default function TeacherCourseDetailPage() {
             <div className="mb-6 rounded-card border border-ochre/40 bg-ochre/10 p-4 text-sm text-ink">
               Editing this brief will change how future lessons are generated. Lessons
               already delivered are not affected.
-              <label className="mt-3 flex items-center gap-2">
+              <label htmlFor="brief-ack-sessions" className="mt-3 flex items-center gap-2">
                 <input
+                  id="brief-ack-sessions"
                   type="checkbox"
                   checked={ackWarning}
                   onChange={(e) => setAckWarning(e.target.checked)}
@@ -150,64 +154,40 @@ export default function TeacherCourseDetailPage() {
               </label>
             </div>
           )}
-          <form onSubmit={saveBrief} className="space-y-4">
-            <input
-              name="title"
-              defaultValue={course.title}
-              className="w-full rounded-btn border border-ink/20 bg-white/60 px-3 py-2 font-display text-lg"
-            />
-            <select
-              name="subject"
-              defaultValue={course.subject}
-              className="w-full rounded-btn border border-ink/20 bg-white/60 px-3 py-2"
-            >
-              {SUBJECT_OPTIONS.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-            <textarea
-              name="target_level"
+          <form onSubmit={saveBrief} className="space-y-6">
+            <BriefFormField field="title" defaultValue={course.title} />
+            <BriefSubjectField defaultValue={course.subject} />
+            <BriefFormField
+              field="target_level"
               defaultValue={course.target_level}
+              multiline
               rows={2}
-              className="w-full rounded-btn border border-ink/20 bg-white/60 px-3 py-2 font-display"
             />
-            <textarea
-              name="learning_outcomes"
+            <BriefFormField
+              field="learning_outcomes"
               defaultValue={course.learning_outcomes}
-              rows={4}
-              className="w-full rounded-btn border border-ink/20 bg-white/60 px-3 py-2 font-display"
+              multiline
+              valueLength={course.learning_outcomes.length}
             />
-            <p className="font-mono text-[10px] text-ink/50">
-              {course.learning_outcomes.length} / {BRIEF_FIELD_HINTS.learning_outcomes.min} min
-            </p>
-            <textarea
-              name="topic_sequence"
+            <BriefFormField
+              field="topic_sequence"
               defaultValue={course.topic_sequence}
-              rows={4}
-              className="w-full rounded-btn border border-ink/20 bg-white/60 px-3 py-2 font-display"
+              multiline
+              valueLength={course.topic_sequence.length}
             />
-            <textarea
-              name="exam_context"
+            <BriefFormField
+              field="exam_context"
               defaultValue={course.exam_context}
+              multiline
               rows={2}
-              className="w-full rounded-btn border border-ink/20 px-3 py-2"
             />
-            <textarea
-              name="special_instructions"
+            <BriefFormField
+              field="special_instructions"
               defaultValue={course.special_instructions}
+              multiline
               rows={2}
-              className="w-full rounded-btn border border-ink/20 px-3 py-2"
             />
-            <input
-              name="approximate_lessons"
-              type="number"
-              min={10}
-              max={120}
-              defaultValue={course.approximate_lessons}
-              className="w-32 rounded-btn border border-ink/20 px-3 py-2"
-            />
+            <BriefLessonsField defaultValue={course.approximate_lessons} />
             <button
               type="submit"
               className="rounded-btn bg-ink px-4 py-2 text-sm text-canvas"
@@ -225,8 +205,16 @@ export default function TeacherCourseDetailPage() {
           ) : (
             <>
               <div className="rounded-card border border-ink/10 p-4">
-                <p className="text-sm font-medium text-ink">Enroll students</p>
-                <ul className="mt-2 max-h-40 space-y-1 overflow-y-auto">
+                <h2 className="text-sm font-medium text-ink" id="enroll-students-heading">
+                  Enroll students
+                </h2>
+                <p className="mt-1 text-xs text-ink/60">
+                  Select students from your school who are not yet on this roster.
+                </p>
+                <ul
+                  className="mt-2 max-h-40 space-y-1 overflow-y-auto"
+                  aria-labelledby="enroll-students-heading"
+                >
                   {available.map((s) => (
                     <li key={s.id}>
                       <label className="flex items-center gap-2 text-sm">

@@ -51,15 +51,22 @@ function ResetPasswordForm() {
       <div className="w-full max-w-md rounded-card border border-ink/10 bg-white/50 p-8 shadow-sm">
         <h1 className="font-display text-3xl font-semibold text-ink">Reset password</h1>
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-          <input
-            type="password"
-            required
-            minLength={8}
-            placeholder="New password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-btn border border-ink/15 bg-canvas px-3 py-2"
-          />
+          <div>
+            <label htmlFor="new-password" className="mb-1 block font-mono text-xs text-ink/70">
+              New password
+            </label>
+            <input
+              id="new-password"
+              type="password"
+              autoComplete="new-password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-btn border border-ink/15 bg-canvas px-3 py-2 outline-none ring-ochre/40 focus:ring-2"
+            />
+            <p className="mt-1 text-xs text-ink/60">At least 8 characters.</p>
+          </div>
           {error ? <p className="text-sm text-red-800">{error}</p> : null}
           <button
             type="submit"
