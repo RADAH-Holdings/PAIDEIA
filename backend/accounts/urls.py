@@ -1,6 +1,10 @@
 from django.urls import path
 
-from accounts.admin_views import AdminUserDeactivateView, AdminUserListCreateView
+from accounts.admin_views import (
+    AdminUserDeactivateView,
+    AdminUserListCreateView,
+    AdminUserResendWelcomeView,
+)
 from accounts.auth_views import (
     ChangePasswordView,
     MeView,
@@ -26,5 +30,10 @@ urlpatterns = [
         "admin/users/<uuid:user_id>/deactivate",
         AdminUserDeactivateView.as_view(),
         name="admin-user-deactivate",
+    ),
+    path(
+        "admin/users/<uuid:user_id>/resend-welcome",
+        AdminUserResendWelcomeView.as_view(),
+        name="admin-user-resend-welcome",
     ),
 ]

@@ -28,6 +28,15 @@ def create_school_user(
     return user, temp_password
 
 
+def resend_welcome_email(*, target: User) -> None:
+    """Issue a new temporary password and send the welcome email again."""
+    temp_password = generate_temp_password()
+    target.set_password(temp_password)
+    target.force_password_change = True
+    target.save(update_fields=["password", "force_password_change", "updated_at"])
+    send_welcome_email(to_email=target.email, name=target.name, temp_password=temp_password)
+
+
 def deactivate_user(*, admin: User, target: User) -> dict:
     target.is_active = False
     target.save(update_fields=["is_active", "updated_at"])

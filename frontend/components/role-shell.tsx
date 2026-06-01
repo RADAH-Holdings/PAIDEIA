@@ -59,8 +59,9 @@ export function RoleShell({ expectedRole, title, children }: RoleShellProps) {
         {children ?? (
           <div className="rounded-card border border-ink/10 bg-white/40 p-8 shadow-sm">
             <p className="text-ink/80">
-              Wave 1 shell — {expectedRole} workspace. Course and session features arrive in later
-              waves.
+              {expectedRole === "student"
+                ? "Your enrolled courses appear on the home page."
+                : `${expectedRole} workspace.`}
             </p>
             <p className="mt-4 font-mono text-xs text-ink/50">
               School: {user.school.name}

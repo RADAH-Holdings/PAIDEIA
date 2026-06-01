@@ -7,6 +7,7 @@ import {
   meSchema,
   paginatedAdminUsersSchema,
   refreshResponseSchema,
+  resendWelcomeResponseSchema,
   type AdminUser,
   type LoginResponse,
   type Me,
@@ -118,6 +119,14 @@ export async function createAdminUser(body: {
     method: "POST",
     body: JSON.stringify(body),
     schema: createUserResponseSchema,
+  });
+}
+
+export async function resendWelcomeEmail(userId: string) {
+  return request(`/admin/users/${userId}/resend-welcome`, {
+    method: "POST",
+    body: "{}",
+    schema: resendWelcomeResponseSchema,
   });
 }
 

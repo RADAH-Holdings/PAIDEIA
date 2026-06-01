@@ -65,6 +65,10 @@ export const changePasswordResponseSchema = z.object({
   force_password_change: z.boolean(),
 });
 
+export const resendWelcomeResponseSchema = z.object({
+  message: z.string(),
+});
+
 export type Me = z.infer<typeof meSchema>;
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
 export type AdminUser = z.infer<typeof adminUserSchema>;
