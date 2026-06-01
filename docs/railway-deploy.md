@@ -1,34 +1,35 @@
 # Railway deployment (Paideia monorepo)
 
-The repository root is **not** deployable by itself. Nixpacks/Railpack need a service root of `backend/` or `frontend/`.
+The repository root is **not** deployable by itself. Nixpacks needs a service **Root Directory** of `backend` or `frontend`.
 
 Create **three** Railway resources:
 
-| Resource | Type | Root Directory | Config file path |
-|----------|------|----------------|------------------|
-| Postgres | Database plugin | — | — |
-| `paideia-api` | Web service | `backend` | `/backend/railway.toml` |
-| `paideia-web` | Web service | `frontend` | `/frontend/railway.toml` |
+| Resource | Type | Root Directory |
+|----------|------|----------------|
+| Postgres | Database plugin | — |
+| `paideia-api` | Web service | `backend` |
+| `paideia-web` | Web service | `frontend` |
+
+Optional: leave **Config file path** empty, or point at `/railway.toml` (Nixpacks builder only).
 
 ## Backend service (`paideia-api`)
 
-1. **Settings → Root Directory:** `backend`
-2. **Settings → Config file path:** `/backend/railway.toml` (absolute from repo root)
-3. **Variables** (minimum):
+1. **Settings → Root Directory:** `backend` (not repo root)
+2. **Settings → Pre-deploy command** (single line): `python manage.py migrate --noinput`
+3. **Start command:** from `Procfile` (Gunicorn + Uvicorn workers) — Railway detects this automatically when Root Directory is `backend`
+4. **Variables** (minimum):
    - `DJANGO_SECRET_KEY` — generate a strong secret
    - `DATABASE_URL` — reference the Railway Postgres plugin
    - `CORS_ALLOWED_ORIGINS` — public URL of the frontend (e.g. `https://paideia-web-production.up.railway.app`)
    - `DJANGO_ALLOWED_HOSTS` — API hostname (e.g. `paideia-api-production.up.railway.app`)
-4. **Deploy** — uses `backend/Dockerfile`; runs migrations via `preDeployCommand` in `railway.toml`
 5. After first deploy: open a shell and run `python manage.py seed_admin` (or set `SEED_*` env vars before seeding)
 
 ## Frontend service (`paideia-web`)
 
 1. **Settings → Root Directory:** `frontend`
-2. **Settings → Config file path:** `/frontend/railway.toml`
-3. **Variables**:
-   - `NEXT_PUBLIC_API_URL` — `https://<your-api-host>/api/v1` (set at **build** time for Docker)
-4. **Deploy** — uses `frontend/Dockerfile` (Next.js standalone)
+2. **Variables**:
+   - `NEXT_PUBLIC_API_URL` — `https://<your-api-host>/api/v1` (must be set before build)
+3. Nixpacks runs `npm run build`; start with `npm start` (or Railway’s detected Next.js start)
 
 ## Networking
 
@@ -36,13 +37,8 @@ Create **three** Railway resources:
 - Reference the web app’s public URL in backend `CORS_ALLOWED_ORIGINS`.
 - Prefer Railway private networking for `DATABASE_URL` (plugin reference), not a public Postgres URL.
 
-## Common error
+## Common errors
 
-```
-Nixpacks was unable to generate a build plan for this app.
-The contents of the app directory are: frontend/ backend/ docs/ ...
-```
+**Nixpacks cannot generate a build plan** — Root Directory is empty or `/` (repo root). Set it to `backend` or `frontend`.
 
-**Cause:** Root Directory is empty or `/` (repo root).
-
-**Fix:** Set Root Directory to `backend` or `frontend` for each web service.
+**`preDeployCommand: Array must contain at most 1 element`** — Do not put a multi-element array in `railway.toml`. Use the dashboard **Pre-deploy command** as one string: `python manage.py migrate --noinput`.
