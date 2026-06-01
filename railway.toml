@@ -1,0 +1,7 @@
+# Railway monorepo — create three services pointing at these roots.
+# Django: set root directory to /backend, start command from Procfile,
+# pre-deploy: python manage.py migrate --noinput
+# Next.js: set root directory to /frontend, build: npm run build, start: npm start
+
+[build]
+builder = "NIXPACKS"

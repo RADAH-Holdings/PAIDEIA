@@ -26,6 +26,9 @@ jobs:
     name: Backend
     runs-on: ubuntu-latest
     if: hashFiles('backend/requirements.txt') != ''
+    env:
+      DJANGO_SECRET_KEY: ci-test-secret-key
+      PAIDEIA_TEST_DB: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
