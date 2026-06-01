@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { CourseCard } from "@/components/course-card";
+import { fieldSelectClass, FormField } from "@/components/form-field";
 import {
   listAdminUsers,
   listCourses,
@@ -60,19 +61,26 @@ export default function AdminCoursesPage() {
                 <div className="rounded-card border border-ochre/30 bg-ochre/5 p-3">
                   <p className="font-mono text-xs text-ochre">Needs teacher</p>
                   {reassigning === course.id ? (
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      <select
-                        className="rounded-btn border border-ink/20 px-2 py-1 text-sm"
-                        value={targetTeacher}
-                        onChange={(e) => setTargetTeacher(e.target.value)}
+                    <div className="mt-2 flex flex-wrap items-end gap-2">
+                      <FormField
+                        label="Assign teacher"
+                        id={`reassign-teacher-${course.id}`}
+                        className="min-w-[12rem]"
                       >
-                        <option value="">Select teacher</option>
-                        {teachers.map((t) => (
-                          <option key={t.id} value={t.id}>
-                            {t.name}
-                          </option>
-                        ))}
-                      </select>
+                        <select
+                          id={`reassign-teacher-${course.id}`}
+                          className={`${fieldSelectClass} py-1 text-sm`}
+                          value={targetTeacher}
+                          onChange={(e) => setTargetTeacher(e.target.value)}
+                        >
+                          <option value="">Select teacher</option>
+                          {teachers.map((t) => (
+                            <option key={t.id} value={t.id}>
+                              {t.name}
+                            </option>
+                          ))}
+                        </select>
+                      </FormField>
                       <button
                         type="button"
                         className="rounded-btn bg-ink px-3 py-1 text-xs text-canvas"
