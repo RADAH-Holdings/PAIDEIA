@@ -6,6 +6,10 @@ from django.core.mail import send_mail
 logger = logging.getLogger(__name__)
 
 
+class EmailDeliveryError(Exception):
+    """Raised when Django reports zero messages sent (e.g. ZeptoMail API rejection)."""
+
+
 def send_welcome_email(*, to_email: str, name: str, temp_password: str) -> None:
     subject = "Your Paideia account"
     body = (
@@ -30,8 +34,20 @@ def send_password_reset_email(*, to_email: str, reset_url: str) -> None:
 
 def _send(subject: str, body: str, to_email: str) -> None:
     from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@paideia.local")
+    backend = getattr(settings, "EMAIL_BACKEND", "")
+    logger.info(
+        "Sending email via %s from %s to %s",
+        backend.rsplit(".", 1)[-1] if backend else "unknown",
+        from_email,
+        to_email,
+    )
     try:
-        send_mail(subject, body, from_email, [to_email], fail_silently=False)
+        sent = send_mail(subject, body, from_email, [to_email], fail_silently=False)
     except Exception:
         logger.exception("Failed to send email to %s", to_email)
         raise
+    if sent != 1:
+        raise EmailDeliveryError(
+            f"Mail backend reported {sent} message(s) sent to {to_email}. "
+            "Check ZeptoMail agent domain, send token, and ZEPTOMAIL_HOSTED_REGION."
+        )

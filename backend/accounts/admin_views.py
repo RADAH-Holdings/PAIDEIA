@@ -16,7 +16,7 @@ from accounts.serializers import (
     DeactivateUserSerializer,
     ResendWelcomeSerializer,
 )
-from accounts.services import create_school_user, deactivate_user, resend_welcome_email, resend_welcome_email
+from accounts.services import create_school_user, deactivate_user, resend_welcome_email
 
 
 class AdminUserListCreateView(ListAPIView):

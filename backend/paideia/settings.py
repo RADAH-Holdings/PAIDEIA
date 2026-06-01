@@ -5,7 +5,7 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
-from paideia.env import clean_env
+from paideia.env import clean_env, normalize_zeptomail_token
 
 load_dotenv()
 
@@ -118,7 +118,7 @@ REST_FRAMEWORK = {
     "UNAUTHENTICATED_USER": None,
 }
 
-_zeptomail_token = clean_env(os.environ.get("ZEPTOMAIL_SEND_MAIL_TOKEN"))
+_zeptomail_token = normalize_zeptomail_token(os.environ.get("ZEPTOMAIL_SEND_MAIL_TOKEN"))
 if _zeptomail_token:
     EMAIL_BACKEND = (
         "zoho_zeptomail.backend.zeptomail_backend.ZohoZeptoMailEmailBackend"
