@@ -29,7 +29,6 @@ def create_school_user(
 
 
 def resend_welcome_email(*, target: User) -> None:
-    """Issue a new temporary password and send the welcome email again."""
     temp_password = generate_temp_password()
     target.set_password(temp_password)
     target.force_password_change = True
@@ -40,10 +39,11 @@ def resend_welcome_email(*, target: User) -> None:
 def deactivate_user(*, admin: User, target: User) -> dict:
     target.is_active = False
     target.save(update_fields=["is_active", "updated_at"])
-    # W3: populate from Course model; empty until courses exist.
     affected_courses: list[dict] = []
     if target.role == User.Role.TEACHER:
-        affected_courses = []
+        from courses.services import active_courses_for_teacher
+
+        affected_courses = active_courses_for_teacher(target)
     return {
         "id": target.id,
         "is_active": target.is_active,

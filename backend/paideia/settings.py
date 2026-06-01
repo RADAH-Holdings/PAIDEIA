@@ -5,6 +5,8 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
+from paideia.env import clean_env
+
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -116,12 +118,31 @@ REST_FRAMEWORK = {
     "UNAUTHENTICATED_USER": None,
 }
 
-EMAIL_BACKEND = os.environ.get(
-    "EMAIL_BACKEND",
-    "django.core.mail.backends.console.EmailBackend",
-)
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@paideia.local")
-PAIDEIA_WEB_ORIGIN = os.environ.get("PAIDEIA_WEB_ORIGIN", "")
+_zeptomail_token = clean_env(os.environ.get("ZEPTOMAIL_SEND_MAIL_TOKEN"))
+if _zeptomail_token:
+    EMAIL_BACKEND = (
+        "zoho_zeptomail.backend.zeptomail_backend.ZohoZeptoMailEmailBackend"
+    )
+    ZOHO_ZEPTOMAIL_API_KEY_TOKEN = _zeptomail_token
+    ZOHO_ZEPTOMAIL_HOSTED_REGION = clean_env(
+        os.environ.get("ZEPTOMAIL_HOSTED_REGION"),
+        default="zeptomail.zoho.com",
+    ) or "zeptomail.zoho.com"
+    DEFAULT_FROM_EMAIL = clean_env(
+        os.environ.get("ZEPTOMAIL_FROM_EMAIL"),
+        default=clean_env(os.environ.get("DEFAULT_FROM_EMAIL"), default="noreply@paideia.local"),
+    )
+else:
+    EMAIL_BACKEND = os.environ.get(
+        "EMAIL_BACKEND",
+        "django.core.mail.backends.console.EmailBackend",
+    )
+    DEFAULT_FROM_EMAIL = clean_env(
+        os.environ.get("DEFAULT_FROM_EMAIL"),
+        default="noreply@paideia.local",
+    )
+
+PAIDEIA_WEB_ORIGIN = clean_env(os.environ.get("PAIDEIA_WEB_ORIGIN"))
 
 # Railway often defines JWT_SIGNING_KEY with no value — treat blank as unset.
 _jwt_signing_key = (os.environ.get("JWT_SIGNING_KEY") or "").strip() or SECRET_KEY

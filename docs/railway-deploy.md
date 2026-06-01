@@ -24,9 +24,12 @@ Optional: leave **Config file path** empty, or point at `/railway.toml` (Nixpack
    - `DJANGO_SECRET_KEY` — generate a strong secret
    - `DATABASE_URL` — reference the Railway Postgres plugin
    - `CORS_ALLOWED_ORIGINS` — public URL of the frontend (e.g. `https://paideia-web-production.up.railway.app`)
-   - `PAIDEIA_WEB_ORIGIN` — same frontend URL (for password-reset links in email)
-   - `DJANGO_ALLOWED_HOSTS` — API hostname (e.g. `paideia-api-production.up.railway.app`)
-   - Leave `JWT_SIGNING_KEY` **unset** (or set a real secret). An empty variable causes `HMAC key must not be empty` on login.
+   - `PAIDEIA_WEB_ORIGIN` — same frontend URL (for password-reset links in email), **no extra quotes** at the end
+   - `ZEPTOMAIL_SEND_MAIL_TOKEN` — Send Mail token from ZeptoMail (paste the token only — **not** wrapped in `<` `>`)
+   - `ZEPTOMAIL_FROM_EMAIL` — must match a verified sender/domain in ZeptoMail (e.g. `noreply@eval.i4nnova.com`)
+   - `ZEPTOMAIL_HOSTED_REGION` — optional; default `zeptomail.zoho.com` (use your region if different)
+   - `DJANGO_ALLOWED_HOSTS` — API hostname (e.g. `paideia-api-production.up.railway.app`), not `*` in production
+   - Leave `JWT_SIGNING_KEY` **unset** entirely. An **empty** variable (`JWT_SIGNING_KEY=""`) breaks login.
 5. After first deploy: `railway ssh` into the backend (or use the dashboard shell) and run:
    ```bash
    /opt/venv/bin/python manage.py migrate --noinput
@@ -43,8 +46,7 @@ Optional: leave **Config file path** empty, or point at `/railway.toml` (Nixpack
 1. **Settings → Root Directory:** `frontend`
 2. **Variables**:
    - `NEXT_PUBLIC_API_URL` — `https://<your-api-host>/api/v1` (must be set before build)
-3. **Node.js 20** — pinned via `frontend/package.json` `engines`, `frontend/.nvmrc`, and `frontend/nixpacks.toml` (`NIXPACKS_NODE_VERSION=20`). Do not rely on Nixpacks’ default Node 18; devDependencies such as Vitest 7 need 20+.
-4. Nixpacks runs `npm run build`; start with `npm start` (or Railway’s detected Next.js start)
+3. Nixpacks runs `npm run build`; start with `npm start` (or Railway’s detected Next.js start)
 
 ## Networking
 

@@ -1,9 +1,13 @@
-# Runs on every PR. App jobs activate automatically once backend/ and frontend/ exist (Wave 1+).
+# Runs on every PR and push to main. Enable Actions under repo Settings → Actions.
 name: CI
 on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   docs:
