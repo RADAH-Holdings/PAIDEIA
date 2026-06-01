@@ -1,0 +1,42 @@
+---
+description: Paideia project rules — always apply
+alwaysApply: true
+---
+
+# Paideia — Always-On Rules
+
+You are building **Paideia**: a content-less LMS where an AI agent generates a
+course one lesson at a time, adapting to each student. Full context: `AGENTS.md`.
+
+## Before any task
+1. Read `AGENTS.md` if you have not this session.
+2. Read the specific `tasks/phase-0N.md` you're working on.
+3. For any requirement code (e.g. `SESS-04`, `AGENT-09`, `AC-03`), look it up in
+   `docs/fsd.md`. For API shapes, data model, or architecture, use `docs/tsd.md`.
+   For anything visual, use `docs/design-system.md`.
+
+## Non-negotiable stack facts
+- **Auth = Django + simplejwt. NOT Clerk.** The User model is the identity. Bearer JWT.
+- **Streaming = `fetch()` + ReadableStream. NEVER EventSource** (POST endpoint).
+- **DB driver = `psycopg` v3** (`psycopg[binary]`), async ORM inside the async view.
+- **Anthropic via `AsyncAnthropic`**, model from `ANTHROPIC_MODEL_VERSION` env var.
+- **Interactive blocks** = sandboxed iframe `srcDoc`, `sandbox="allow-scripts"`,
+  no `allow-same-origin`; CSP via injected `<meta>`; failure via `postMessage`
+  `paideia:ready` handshake + 4s timeout. Never `onError`, never the iframe `csp` attr.
+- **No FAILED session state** — failed generation deletes the row.
+- **Cross-scope reads return 404**, not 403.
+
+## Design tokens (canonical)
+Fraunces (display) · Geist (body) · JetBrains Mono (meta). Canvas `#FAF6EE`
+(parchment, never pure white). Primary ink-blue `#1C2A4A`. Accent ochre `#B8862C`.
+Buttons 6px, cards 10px. Earth-palette subjects, no bright primaries.
+
+## Code conventions
+- API shape change ⇒ Django serializer + `frontend/lib/schemas.ts` zod schema in the SAME commit.
+- `backend/agent/` stays pure: no imports from accounts/courses/sessions, no Django, no DB.
+- Every test gets an ID: `T-W{n}-{nn}` (unit), `T-SEAM-W{n}` (seam).
+- A wave is done only when its exit criteria pass. Don't start the next wave early.
+
+## When unsure
+Prefer asking or leaving a `// TODO(spec): <question>` over inventing behaviour
+that isn't in the specs. Hallucinated requirements are worse than flagged gaps.

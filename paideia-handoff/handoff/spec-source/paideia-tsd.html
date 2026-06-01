@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paideia — Technical Specification Document</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f8f8f6;--surface:#ffffff;--ink:#0f0f0e;--ink-2:#3a3a38;--ink-3:#6e6e6a;--ink-4:#a0a09c;
+  --rule:#e4e4e0;--accent:#1a3a8f;--accent-light:#e8edf8;--accent-mid:#3b5fc0;
+  --green:#1a6b3a;--green-bg:#e8f4ed;--amber:#7a4f10;--amber-bg:#fdf3e3;
+  --red:#8b1a1a;--red-bg:#fbeaea;--purple:#4a1a8f;--purple-bg:#f0eafa;
+  --teal:#0e6b5e;--teal-bg:#e4f4f1;--sidebar-w:300px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;font-size:14px;}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.7;display:flex;min-height:100vh;}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--ink);color:rgba(255,255,255,0.75);height:100vh;position:sticky;top:0;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent;}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px;}
+.sb-header{padding:24px 22px 18px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.sb-product{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;letter-spacing:0.05em;margin-bottom:3px;}
+.sb-doctype{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:0.15em;text-transform:uppercase;}
+.sb-meta{padding:14px 22px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.sb-meta-row{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;padding:3px 0;}
+.sb-meta-row .l{color:rgba(255,255,255,0.28);}.sb-meta-row .v{color:rgba(255,255,255,0.65);}
+.pill{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.08em;}
+.pill-draft{background:rgba(122,79,16,0.4);color:#f5c87a;}
+.pill-tsd{background:rgba(74,26,143,0.4);color:#c89cf5;}
+.sb-nav{padding:16px 0;flex:1;}
+.nav-group-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.18);padding:12px 22px 5px;}
+.nav-item{display:flex;align-items:baseline;gap:10px;padding:5px 22px;font-size:12px;color:rgba(255,255,255,0.5);text-decoration:none;transition:all 0.15s;cursor:pointer;line-height:1.4;}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,0.04);}
+.nav-item.active{color:#fff;background:rgba(74,26,143,0.3);border-right:2px solid #8b5fc0;}
+.nav-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,0.18);min-width:26px;}
+.nav-item:hover .nav-num,.nav-item.active .nav-num{color:#8b5fc0;}
+.nav-sub{padding:3px 22px 3px 58px;font-size:11px;color:rgba(255,255,255,0.3);text-decoration:none;display:block;transition:color 0.15s;cursor:pointer;line-height:1.5;}
+.nav-sub:hover{color:rgba(255,255,255,0.65);}
+.nav-sub.active{color:#c89cf5;}
+.main{flex:1;min-width:0;}
+.doc-header{background:var(--surface);border-bottom:2px solid var(--ink);padding:44px 60px 36px;}
+.dh-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--ink-3);text-transform:uppercase;margin-bottom:14px;}
+.dh-title{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;letter-spacing:-0.02em;line-height:1.1;margin-bottom:6px;}
+.dh-sub{font-size:15px;color:var(--ink-2);font-weight:300;font-style:italic;margin-bottom:28px;}
+.dh-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);}
+.dh-cell{background:var(--bg);padding:10px 14px;}
+.dh-cell .ml{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.18em;color:var(--ink-4);text-transform:uppercase;margin-bottom:3px;}
+.dh-cell .mv{font-size:12px;font-weight:500;color:var(--ink);}
+.content{padding:0 60px 80px;}
+.section{padding-top:60px;border-bottom:1px solid var(--rule);padding-bottom:44px;}
+.section:last-child{border-bottom:none;}
+.section-header{display:flex;align-items:baseline;gap:14px;margin-bottom:24px;}
+.sec-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--purple);min-width:32px;}
+.sec-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.01em;}
+.subsection{margin-top:32px;}
+.sub-header{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--rule);}
+.sub-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-4);}
+.sub-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--ink-2);}
+p{color:var(--ink-2);font-size:14px;line-height:1.8;max-width:780px;}
+p+p{margin-top:10px;}
+.lead{font-size:15px;color:var(--ink);font-weight:400;line-height:1.75;max-width:740px;margin-bottom:20px;}
+code{font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:rgba(74,26,143,0.07);color:var(--purple);padding:1px 5px;border-radius:2px;}
+.callout{padding:14px 18px;margin:18px 0;max-width:780px;border-left:3px solid;font-size:13.5px;line-height:1.7;}
+.callout strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;display:block;margin-bottom:4px;}
+.cn{background:var(--accent-light);border-color:var(--accent-mid);color:var(--accent);}
+.cw{background:var(--amber-bg);border-color:#c87920;color:var(--amber);}
+.cc{background:var(--red-bg);border-color:#c03030;color:var(--red);}
+.cs{background:var(--green-bg);border-color:#1a8f4a;color:var(--green);}
+.cp{background:var(--purple-bg);border-color:#7a3ac0;color:var(--purple);}
+.ct{background:var(--teal-bg);border-color:#0e8f7a;color:var(--teal);}
+.rtable{width:100%;border-collapse:collapse;font-size:13px;margin-top:18px;}
+.rtable thead tr{background:var(--ink);}
+.rtable th{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.55);padding:9px 13px;text-align:left;font-weight:400;}
+.rtable td{padding:11px 13px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.6;color:var(--ink-2);}
+.rtable tr:nth-child(even) td{background:var(--bg);}
+.rtable tr:last-child td{border-bottom:none;}
+.rtable code{font-size:11.5px;}
+.codeblock{background:#0f1117;border-radius:2px;padding:24px 28px;margin-top:18px;overflow-x:auto;max-width:840px;}
+.codeblock pre{font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.8;color:#e4e4e0;white-space:pre;}
+.cb-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.15em;color:rgba(255,255,255,0.25);text-transform:uppercase;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.c-entity{color:#7eb8f7;font-weight:500;}.c-type{color:#a8e6a0;}.c-comment{color:#5a6270;font-style:italic;}
+.c-pk{color:#e89cf5;}.c-constraint{color:#f7c77e;}.c-kw{color:#e89cf5;}.c-str{color:#a8e6a0;}
+.c-var{color:#7eb8f7;}.c-inst{color:#f7c77e;}.c-fn{color:#f5d87e;}.c-idx{color:#7ec8c0;}
+.endpoint{background:var(--surface);border:1px solid var(--rule);margin-top:16px;max-width:840px;}
+.ep-header{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--rule);background:var(--bg);}
+.ep-method{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding:3px 9px;border-radius:2px;letter-spacing:0.05em;}
+.m-get{background:var(--accent-light);color:var(--accent);}
+.m-post{background:var(--green-bg);color:var(--green);}
+.m-patch{background:var(--amber-bg);color:var(--amber);}
+.m-delete{background:var(--red-bg);color:var(--red);}
+.ep-path{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink);font-weight:500;}
+.ep-auth{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-4);letter-spacing:0.1em;text-transform:uppercase;}
+.ep-body{padding:14px 18px;}
+.ep-desc{font-size:13px;color:var(--ink-2);margin-bottom:10px;line-height:1.6;}
+.ep-section{margin-top:12px;}
+.ep-section-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.15em;color:var(--ink-4);text-transform:uppercase;margin-bottom:5px;}
+.ep-code{background:#0f1117;border-radius:2px;padding:12px 16px;overflow-x:auto;}
+.ep-code pre{font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.7;color:#c8c8c4;white-space:pre;}
+.ep-roles{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.role-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;padding:2px 7px;border-radius:2px;letter-spacing:0.05em;}
+.rt-admin{background:rgba(139,26,26,0.1);color:var(--red);}
+.rt-teacher{background:rgba(122,79,16,0.12);color:var(--amber);}
+.rt-student{background:rgba(26,107,58,0.1);color:var(--green);}
+.diagram{background:var(--surface);border:1px solid var(--rule);padding:30px 34px;margin-top:18px;max-width:840px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;overflow-x:auto;}
+.dg-label{font-size:9px;letter-spacing:0.2em;color:var(--ink-4);text-transform:uppercase;margin-bottom:18px;}
+.dg-row{display:flex;align-items:center;margin-bottom:3px;flex-wrap:nowrap;}
+.dg-box{padding:7px 12px;font-size:11px;white-space:nowrap;font-weight:500;border:1px solid;}
+.b-client{background:var(--accent-light);border-color:var(--accent-mid);color:var(--accent);}
+.b-sys{background:var(--ink);border-color:var(--ink);color:#fff;}
+.b-store{background:var(--green-bg);border-color:var(--green);color:var(--green);}
+.b-ai{background:#1a1a3a;border-color:#3b5fc0;color:#7eb8f7;}
+.b-ext{background:var(--purple-bg);border-color:#7a3ac0;color:var(--purple);}
+.b-render{background:var(--teal-bg);border-color:var(--teal);color:var(--teal);}
+.dg-arr{color:var(--ink-4);padding:0 6px;font-size:13px;flex-shrink:0;}
+.dg-note{font-size:9.5px;color:var(--ink-4);margin-left:6px;letter-spacing:0.05em;}
+.dg-step{display:flex;gap:12px;padding:5px 0;align-items:baseline;}
+.dg-step-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--purple);background:var(--purple-bg);min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:2px;flex-shrink:0;}
+.dg-step-text{font-size:12px;color:var(--ink-2);line-height:1.6;font-family:'IBM Plex Sans',sans-serif;}
+.dg-step-text code{font-size:11px;}
+.tree{background:#0f1117;border-radius:2px;padding:22px 26px;margin-top:16px;overflow-x:auto;max-width:840px;}
+.tree pre{font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.7;color:#c8c8c4;white-space:pre;}
+.tree .t-dir{color:#7eb8f7;}.tree .t-file{color:#c8c8c4;}.tree .t-note{color:#5a6270;font-style:italic;}
+.tree .t-key{color:#f5d87e;}
+.contract{background:var(--surface);border:1px solid var(--rule);margin-top:16px;max-width:840px;}
+.ct-header{padding:12px 18px;background:var(--ink);color:#fff;display:flex;align-items:center;gap:12px;}
+.ct-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#c89cf5;}
+.ct-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;}
+.ct-pair{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,0.5);}
+.ct-body{padding:16px 18px;}
+.ct-grid{display:grid;grid-template-columns:120px 1fr;gap:8px 16px;font-size:12.5px;}
+.ct-k{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-4);text-transform:uppercase;letter-spacing:0.1em;padding-top:2px;}
+.ct-v{color:var(--ink-2);line-height:1.6;}
+.ct-v code{font-size:11px;}
+.phase-list{margin-top:18px;max-width:820px;}
+.phase{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--rule);}
+.phase:last-child{border-bottom:none;}
+.phase-num{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;color:rgba(74,26,143,0.2);min-width:44px;line-height:1;}
+.phase-body{flex:1;}
+.phase-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;margin-bottom:4px;}
+.phase-desc{font-size:13px;color:var(--ink-3);line-height:1.65;}
+.phase-deliv{margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--purple);}
+.tag-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+.tag{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--surface);border:1px solid var(--rule);padding:4px 10px;border-radius:2px;color:var(--ink-2);}
+.tag b{color:var(--purple);font-weight:600;}
+.future-section{background:var(--ink);padding:48px 60px;}
+.fs-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.fs-text{font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(255,255,255,0.3);}
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .doc-header,.content,.future-section{padding-left:24px;padding-right:24px;}
+  .ct-grid{grid-template-columns:1fr;}
+  .dg-row{flex-wrap:wrap;}
+}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sb-header">
+    <div class="sb-product">PAIDEIA</div>
+    <div class="sb-doctype">Technical Spec · MVP</div>
+  </div>
+  <div class="sb-meta">
+    <div class="sb-meta-row"><span class="l">Doc ID</span><span class="v">PAI-TSD-001</span></div>
+    <div class="sb-meta-row"><span class="l">Version</span><span class="pill pill-tsd">v1.0</span></div>
+    <div class="sb-meta-row"><span class="l">Status</span><span class="pill pill-draft">DRAFT</span></div>
+    <div class="sb-meta-row"><span class="l">Pairs with</span><span class="v">PAI-FSD-001 v2</span></div>
+  </div>
+  <div class="sb-nav">
+    <div class="nav-group-label">Foundation</div>
+    <a class="nav-item" href="#s1"><span class="nav-num">01</span>Purpose &amp; Doc Map</a>
+    <a class="nav-item" href="#s2"><span class="nav-num">02</span>Architecture Overview</a>
+    <a class="nav-item" href="#s3"><span class="nav-num">03</span>Technology Stack</a>
+    <a class="nav-item" href="#s4"><span class="nav-num">04</span>Repository Structure</a>
+    <div class="nav-group-label">Data &amp; Backend</div>
+    <a class="nav-item" href="#s5"><span class="nav-num">05</span>Data Layer</a>
+    <a class="nav-sub" href="#s5-1">5.1 Schema &amp; Indices</a>
+    <a class="nav-sub" href="#s5-2">5.2 Migrations</a>
+    <a class="nav-item" href="#s6"><span class="nav-num">06</span>Backend Architecture</a>
+    <a class="nav-sub" href="#s6-1">6.1 Django Apps</a>
+    <a class="nav-sub" href="#s6-2">6.2 Async Model</a>
+    <a class="nav-sub" href="#s6-3">6.3 Settings</a>
+    <a class="nav-item" href="#s7"><span class="nav-num">07</span>API Contract</a>
+    <a class="nav-sub" href="#s7-1">7.1 Conventions</a>
+    <a class="nav-sub" href="#s7-2">7.2 Identity</a>
+    <a class="nav-sub" href="#s7-3">7.3 Accounts</a>
+    <a class="nav-sub" href="#s7-4">7.4 Courses</a>
+    <a class="nav-sub" href="#s7-5">7.5 Enrollment</a>
+    <a class="nav-sub" href="#s7-6">7.6 Sessions</a>
+    <a class="nav-sub" href="#s7-7">7.7 Progress</a>
+    <a class="nav-item" href="#s8"><span class="nav-num">08</span>Auth &amp; Authorization</a>
+    <div class="nav-group-label">AI &amp; Streaming</div>
+    <a class="nav-item" href="#s9"><span class="nav-num">09</span>AI Agent Layer</a>
+    <a class="nav-item" href="#s10"><span class="nav-num">10</span>Streaming Pipeline</a>
+    <div class="nav-group-label">Frontend</div>
+    <a class="nav-item" href="#s11"><span class="nav-num">11</span>Frontend Architecture</a>
+    <a class="nav-item" href="#s12"><span class="nav-num">12</span>Rendering Engine</a>
+    <div class="nav-group-label">Integration</div>
+    <a class="nav-item" href="#s13"><span class="nav-num">13</span>Interface Contracts</a>
+    <a class="nav-item" href="#s14"><span class="nav-num">14</span>Error Handling</a>
+    <a class="nav-item" href="#s15"><span class="nav-num">15</span>Security Architecture</a>
+    <div class="nav-group-label">Operations</div>
+    <a class="nav-item" href="#s16"><span class="nav-num">16</span>Deployment</a>
+    <a class="nav-item" href="#s17"><span class="nav-num">17</span>Observability</a>
+    <a class="nav-item" href="#s18"><span class="nav-num">18</span>Key Sequence Flows</a>
+    <a class="nav-item" href="#s19"><span class="nav-num">19</span>Implementation Sequence</a>
+  </div>
+</nav>
+<div class="main">
+<div class="doc-header">
+  <div class="dh-eyebrow">Paideia · MVP · Technical Specification Document</div>
+  <div class="dh-title">System Technical Specification</div>
+  <div class="dh-sub">How the system is built — architecture, contracts, and interfaces</div>
+  <div class="dh-meta">
+    <div class="dh-cell"><div class="ml">Document ID</div><div class="mv">PAI-TSD-001</div></div>
+    <div class="dh-cell"><div class="ml">Version</div><div class="mv">1.0 — Draft</div></div>
+    <div class="dh-cell"><div class="ml">Pairs With</div><div class="mv">PAI-FSD-001 v2.0</div></div>
+    <div class="dh-cell"><div class="ml">Scope</div><div class="mv">MVP — Core Loop</div></div>
+    <div class="dh-cell"><div class="ml">Audience</div><div class="mv">Engineering</div></div>
+    <div class="dh-cell"><div class="ml">Classification</div><div class="mv">Internal — Confidential</div></div>
+  </div>
+</div>
+<div class="content">
+
+<div class="section" id="s1">
+  <div class="section-header"><span class="sec-num">01</span><h2 class="sec-title">Purpose &amp; Document Map</h2></div>
+  <p class="lead">This Technical Specification Document (TSD) defines how the Paideia MVP is built. Where the Functional Specification (FSD, PAI-FSD-001 v2.0) defines what the system does and why, this document defines the architecture, the interfaces between components, the API contract, the data layer, and the implementation detail required to build it.</p>
+  <p>The two documents are read together. Every functional requirement in the FSD (identified by codes such as <code>SESS-02</code> or <code>REND-03</code>) is realised by one or more technical components specified here. Where this document references an FSD requirement, it does so by code.</p>
+  <div class="callout cp"><strong>Governing Principle — Interfaces First</strong>The central design rule of this TSD is that every boundary between two components has an explicit, versioned contract. The browser, the Next.js frontend, the Django API, the Anthropic API, and the PostgreSQL database each communicate only through defined contracts (Section 13). No component reaches across a boundary in an undefined way. This is what makes the system buildable by more than one person and debuggable when something breaks.</p></div>
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">1.1</span><span class="sub-title">The Four Boundaries</span></div>
+    <p>The MVP has exactly four interface boundaries. Every one is contracted in Section 13. If a behaviour is not described at the boundary it crosses, it is undefined and must not be relied upon. (Authentication is no longer a separate boundary — it is handled inside Django and travels over B2 as a Bearer token.)</p>
+    <table class="rtable">
+      <thead><tr><th>#</th><th>Boundary</th><th>Protocol</th><th>Contract</th></tr></thead>
+      <tbody>
+        <tr><td>B1</td><td>Browser ↔ Next.js</td><td>HTTPS, streamed fetch</td><td>Next.js pages and route handlers; a fetch streaming response for lesson delivery</td></tr>
+        <tr><td>B2</td><td>Next.js ↔ Django API</td><td>HTTPS REST + stream, Bearer JWT</td><td>The API Contract (Section 7) — JSON request/response, a streamed response for session generation, and the /auth endpoints that issue Django JWTs</td></tr>
+        <tr><td>B3</td><td>Django ↔ Anthropic</td><td>HTTPS, Anthropic SDK</td><td>Async streaming (lesson) + async non-streaming (assessment)</td></tr>
+        <tr><td>B4</td><td>Django ↔ PostgreSQL</td><td>TCP, psycopg3 async</td><td>Django ORM async; private Railway networking</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="s2">
+  <div class="section-header"><span class="sec-num">02</span><h2 class="sec-title">Architecture Overview</h2></div>
+  <p class="lead">Paideia MVP is a three-service system on Railway: a Next.js frontend, a Django API backend, and a PostgreSQL database. It integrates one external service — the Anthropic API for content generation. Authentication is handled inside Django (no external identity provider). The architecture is deliberately conventional; the novelty of the product is in the AI agent loop, not in the infrastructure.</p>
+  <div class="diagram">
+    <div class="dg-label">System Architecture — Runtime View</div>
+    <div class="dg-row"><div class="dg-box b-client">Student / Teacher / Admin Browser</div></div>
+    <div style="margin:4px 0 4px 30px;color:#a0a09c;">│ HTTPS · B1</div>
+    <div class="dg-row"><div class="dg-box b-client">Next.js 14 — Railway Service 1</div></div>
+    <div style="margin:4px 0 4px 30px;color:#a0a09c;">│ HTTPS REST + stream · Bearer JWT · B2 (includes /auth login &amp; refresh)</div>
+    <div class="dg-row"><div class="dg-box b-sys">Django 5 API — Railway Service 2 (owns auth: simplejwt + User model)</div></div>
+    <div style="margin:4px 0 4px 60px;color:#a0a09c;">├─ B3 → Anthropic API (async stream + async call)</div>
+    <div style="margin:4px 0 4px 60px;color:#a0a09c;">└─ B4 → PostgreSQL — Railway Service 3 (psycopg3, private net)</div>
+  </div>
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">2.1</span><span class="sub-title">Architectural Decisions</span></div>
+    <table class="rtable">
+      <thead><tr><th>Decision</th><th>Choice</th><th>Rationale</th></tr></thead>
+      <tbody>
+        <tr><td>Frontend / backend split</td><td>Decoupled — Next.js + Django API</td><td>Lesson rendering needs a reactive client (streaming, interactive iframes, assessment state machine). Django is API-only. The two never share a template layer.</td></tr>
+        <tr><td>Backend concurrency model</td><td>ASGI async — Uvicorn workers</td><td>AI calls hold connections 15–30s. Async views let one worker handle many in-flight generations without thread exhaustion.</td></tr>
+        <tr><td>Lesson delivery transport</td><td>Server-Sent Events (one-way stream)</td><td>Lesson generation is server→client only. SSE is simpler than WebSockets, survives proxies with one header, and maps directly to the Anthropic token stream.</td></tr>
+        <tr><td>Identity ownership</td><td>Django owns identity and authorization</td><td>The User model is the single source of truth. simplejwt issues tokens; password hashing is Django's. No external provider, so no sync drift and no third-party child-data processor.</td></tr>
+        <tr><td>Database</td><td>PostgreSQL with JSONB</td><td>Relational core for users/courses/sessions; JSONB for lesson blocks and assessment questions — structured but schema-flexible documents.</td></tr>
+        <tr><td>Deployment</td><td>All three services on Railway</td><td>One platform, one dashboard, private networking between API and DB. Operational simplicity for a small team.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">2.2</span><span class="sub-title">Module-to-Service Mapping</span></div>
+    <p>The eight functional modules from FSD Section 4 map onto the three services as follows. A module is not a deployable unit — it is a logical grouping. Several modules live in one service.</p>
+    <table class="rtable">
+      <thead><tr><th>FSD Module</th><th>Service</th><th>Implemented As</th></tr></thead>
+      <tbody>
+        <tr><td>M1 Auth &amp; Identity</td><td>Django + Next.js</td><td>simplejwt + permission classes (Django) + route guard (Next.js)</td></tr>
+        <tr><td>M2 Account Management</td><td>Django</td><td><code>accounts</code> Django app</td></tr>
+        <tr><td>M3 Course Brief</td><td>Django</td><td><code>courses</code> Django app</td></tr>
+        <tr><td>M4 Enrollment</td><td>Django</td><td><code>courses</code> app — enrollment viewset</td></tr>
+        <tr><td>M5 Session Orchestration</td><td>Django</td><td><code>sessions</code> Django app — the orchestrator service class</td></tr>
+        <tr><td>M6 Context Assembly</td><td>Django</td><td><code>sessions</code> app — <code>context.py</code> module</td></tr>
+        <tr><td>M7 AI Agent</td><td>Django</td><td><code>agent</code> Django app — Anthropic client wrapper, prompts, parsers</td></tr>
+        <tr><td>M8 Rendering Engine</td><td>Next.js</td><td><code>components/lesson/*</code> — three renderers + block router</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="s3">
+  <div class="section-header"><span class="sec-num">03</span><h2 class="sec-title">Technology Stack</h2></div>
+  <p>Exact versions and packages. Versions are pinned at project start and upgraded deliberately, never incidentally. The model version is the one exception — it is an environment variable, not a pinned dependency.</p>
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">3.1</span><span class="sub-title">Backend — Django Service</span></div>
+    <div class="tag-list">
+      <span class="tag"><b>Python</b> 3.12</span>
+      <span class="tag"><b>Django</b> 5.x</span>
+      <span class="tag"><b>djangorestframework</b> 3.15+</span>
+      <span class="tag"><b>psycopg</b> 3.x (binary)</span>
+      <span class="tag"><b>anthropic</b> (latest SDK)</span>
+      <span class="tag"><b>djangorestframework-simplejwt</b></span>
+      <span class="tag"><b>django-cors-headers</b></span>
+      <span class="tag"><b>gunicorn</b></span>
+      <span class="tag"><b>uvicorn</b> (worker class)</span>
+      <span class="tag"><b>python-dotenv</b></span>
+      <span class="tag"><b>pydantic</b> 2.x (output validation)</span>
+    </div>
+    <div class="callout cw" style="margin-top:16px;"><strong>Pin Note — psycopg</strong>The package is <code>psycopg</code> (version 3), installed as <code>psycopg[binary]</code>. It is NOT <code>psycopg2</code> and NOT a package literally named <code>psycopg3</code>. Installing the wrong one is the single most common setup error and causes <code>SynchronousOnlyOperation</code> failures inside async views.</div>
+  </div>
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">3.2</span><span class="sub-title">Frontend — Next.js Service</span></div>
+    <div class="tag-list">
+      <span class="tag"><b>Node.js</b> 20 LTS</span>
+      <span class="tag"><b>Next.js</b> 14 (App Router)</span>
+      <span class="tag"><b>React</b> 18</span>
+      <span class="tag"><b>TypeScript</b> 5.x</span>
+      <span class="tag"><b>jwt-decode</b> (read role from token)</span>
+      <span class="tag"><b>react-markdown</b></span>
+      <span class="tag"><b>remark-math</b> · <b>remark-gfm</b></span>
+      <span class="tag"><b>rehype-katex</b> · <b>rehype-highlight</b></span>
+      <span class="tag"><b>katex</b></span>
+      <span class="tag"><b>tailwindcss</b></span>
+      <span class="tag"><b>zod</b> (client-side response validation)</span>
+    </div>
+  </div>
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">3.3</span><span class="sub-title">Infrastructure &amp; External</span></div>
+    <div class="tag-list">
+      <span class="tag"><b>Railway</b> — 3 services</span>
+      <span class="tag"><b>PostgreSQL</b> 16 (Railway managed)</span>
+      <span class="tag"><b>Anthropic API</b> — content generation</span>
+      <span class="tag"><b>SMTP / email backend</b> — welcome &amp; reset mail</span>
+      <span class="tag"><b>GitHub</b> — source + CI</span>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="s4">
+  <div class="section-header"><span class="sec-num">04</span><h2 class="sec-title">Repository Structure</h2></div>
+  <p>A single Git repository with two top-level directories — <code>backend/</code> and <code>frontend/</code>. They deploy as two separate Railway services from the same repo using per-service root directories. This keeps the API contract changes and their consuming frontend changes in the same commit and pull request.</p>
+  <div class="tree">
+    <pre>
+paideia/
+├── <span class="t-dir">backend/</span>                  <span class="t-note"># Django API — Railway Service 2</span>
+│   ├── <span class="t-dir">paideia/</span>              <span class="t-note"># Django project root</span>
+│   │   ├── <span class="t-file">settings.py</span>       <span class="t-note"># env-driven config</span>
+│   │   ├── <span class="t-file">asgi.py</span>           <span class="t-note"># ASGI entrypoint — used by Uvicorn</span>
+│   │   └── <span class="t-file">urls.py</span>           <span class="t-note"># root URL conf</span>
+│   ├── <span class="t-dir">accounts/</span>             <span class="t-note"># M2 — users, schools, account mgmt</span>
+│   │   ├── <span class="t-file">models.py</span>         <span class="t-note"># School, User</span>
+│   │   ├── <span class="t-file">authentication.py</span> <span class="t-note"># simplejwt config + /auth/login, /auth/refresh views</span>
+│   │   ├── <span class="t-file">permissions.py</span>    <span class="t-note"># IsAdmin, IsTeacher, IsCourseOwner, IsSameSchool</span>
+│   │   ├── <span class="t-file">passwords.py</span>       <span class="t-note"># temp-password generation, reset flow, force-change guard</span>
+│   │   ├── <span class="t-file">serializers.py</span>
+│   │   └── <span class="t-file">views.py</span>
+│   ├── <span class="t-dir">courses/</span>              <span class="t-note"># M3 + M4 — course briefs, enrollment</span>
+│   │   ├── <span class="t-file">models.py</span>         <span class="t-note"># Course, Enrollment</span>
+│   │   ├── <span class="t-file">serializers.py</span>
+│   │   └── <span class="t-file">views.py</span>
+│   ├── <span class="t-dir">sessions/</span>             <span class="t-note"># M5 + M6 — orchestration, context assembly</span>
+│   │   ├── <span class="t-file">models.py</span>         <span class="t-note"># Session, Lesson, Assessment, Response, SessionHistory</span>
+│   │   ├── <span class="t-file">orchestrator.py</span>  <span class="t-note"># the session state machine + sequencing</span>
+│   │   ├── <span class="t-file">context.py</span>       <span class="t-note"># context assembly + history summarisation</span>
+│   │   ├── <span class="t-file">views.py</span>         <span class="t-note"># async SSE view + sync endpoints</span>
+│   │   └── <span class="t-file">serializers.py</span>
+│   ├── <span class="t-dir">agent/</span>                <span class="t-note"># M7 — AI agent integration</span>
+│   │   ├── <span class="t-file">client.py</span>         <span class="t-note"># AsyncAnthropic wrapper</span>
+│   │   ├── <span class="t-file">prompts.py</span>        <span class="t-note"># versioned prompt templates</span>
+│   │   ├── <span class="t-file">parsers.py</span>        <span class="t-note"># tag extraction, JSON parsing</span>
+│   │   ├── <span class="t-file">validators.py</span>     <span class="t-note"># pydantic schemas, HTML block validation</span>
+│   │   └── <span class="t-file">schemas.py</span>        <span class="t-note"># Lesson, Block, Assessment pydantic models</span>
+│   ├── <span class="t-dir">common/</span>               <span class="t-note"># shared — logging, errors, pagination</span>
+│   ├── <span class="t-file">requirements.txt</span>
+│   ├── <span class="t-file">Procfile</span>             <span class="t-note"># gunicorn ... -k uvicorn.workers.UvicornWorker</span>
+│   └── <span class="t-file">manage.py</span>
+│
+├── <span class="t-dir">frontend/</span>                 <span class="t-note"># Next.js — Railway Service 1</span>
+│   ├── <span class="t-dir">app/</span>
+│   │   ├── <span class="t-dir">(auth)/</span>           <span class="t-note"># sign-in, sign-up — public</span>
+│   │   ├── <span class="t-dir">admin/</span>            <span class="t-note"># admin role route group</span>
+│   │   ├── <span class="t-dir">teacher/</span>          <span class="t-note"># teacher role route group</span>
+│   │   ├── <span class="t-dir">student/</span>          <span class="t-note"># student role route group</span>
+│   │   ├── <span class="t-file">layout.tsx</span>        <span class="t-note"># auth context provider, global KaTeX CSS</span>
+│   │   └── <span class="t-file">middleware.ts</span>     <span class="t-note"># token-presence route protection</span>
+│   ├── <span class="t-dir">components/</span>
+│   │   ├── <span class="t-dir">lesson/</span>           <span class="t-note"># M8 — the Rendering Engine</span>
+│   │   │   ├── <span class="t-file">LessonRenderer.tsx</span>   <span class="t-note"># block router</span>
+│   │   │   ├── <span class="t-file">TextBlock.tsx</span>       <span class="t-note"># renderer 1</span>
+│   │   │   ├── <span class="t-file">InteractiveBlock.tsx</span><span class="t-note"># renderer 2 — sandboxed iframe</span>
+│   │   │   ├── <span class="t-file">CalloutBlock.tsx</span>
+│   │   │   └── <span class="t-file">AssessmentEngine.tsx</span> <span class="t-note"># renderer 3 — state machine</span>
+│   │   └── <span class="t-dir">ui/</span>
+│   ├── <span class="t-dir">lib/</span>
+│   │   ├── <span class="t-file">api.ts</span>            <span class="t-note"># typed API client — wraps B2</span>
+│   │   ├── <span class="t-file">stream.ts</span>         <span class="t-note"># fetch + ReadableStream reader for lesson streaming</span>
+│   │   └── <span class="t-file">schemas.ts</span>        <span class="t-note"># zod schemas mirroring API responses</span>
+│   ├── <span class="t-file">package.json</span>
+│   └── <span class="t-file">next.config.js</span>
+│
+├── <span class="t-file">README.md</span>
+└── <span class="t-file">.github/workflows/</span>      <span class="t-note"># CI — lint, test, migrate-check</span>
+    </pre>
+  </div>
+  <div class="callout cn"><strong>Why a Monorepo</strong>The API contract (Section 7) is the most fragile interface in the system. When an endpoint changes shape, the Django serializer and the TypeScript zod schema in <code>frontend/lib/schemas.ts</code> must change together. A monorepo forces both into the same commit and the same review. Two separate repos would let them drift.</div>
+</div>
+
+<div class="section" id="s5">
+  <div class="section-header"><span class="sec-num">05</span><h2 class="sec-title">Data Layer</h2></div>
+  <p>PostgreSQL 16. The schema below is the authoritative data model — it extends the FSD Section 17 schema with the indices, cascade rules, and constraints required for a correct and performant implementation.</p>
+
+  <div class="subsection" id="s5-1">
+    <div class="sub-header"><span class="sub-num">5.1</span><span class="sub-title">Schema with Indices &amp; Constraints</span></div>
+    <div class="codeblock">
+      <div class="cb-label">PostgreSQL DDL — Indices and Cascade Rules</div>
+      <pre>
+<span class="c-comment">-- Every query that the API makes is supported by an index below.
+-- Cascade rules reflect FSD immutability requirements (HIST-01).</span>
+
+<span class="c-entity">users</span>
+  <span class="c-idx">INDEX</span>  ix_users_school        <span class="c-comment">(school_id)        -- admin lists users by school</span>
+  <span class="c-idx">INDEX</span>  ix_users_email         <span class="c-comment">(email) UNIQUE     -- login lookup by email</span>
+  <span class="c-idx">INDEX</span>  ix_users_school_role   <span class="c-comment">(school_id, role)  -- "all teachers in school"</span>
+
+<span class="c-entity">courses</span>
+  <span class="c-idx">INDEX</span>  ix_courses_teacher     <span class="c-comment">(teacher_id)               -- teacher's course list</span>
+  <span class="c-idx">INDEX</span>  ix_courses_school_stat <span class="c-comment">(school_id, status)        -- active courses in school</span>
+  <span class="c-constraint">ON DELETE</span>  teacher_id <span class="c-constraint">SET NULL</span>     <span class="c-comment">-- FSD ACC-05: deactivation never deletes; nullable</span>
+
+<span class="c-entity">enrollments</span>
+  <span class="c-idx">UNIQUE</span> ux_enroll_course_stu   <span class="c-comment">(course_id, student_id)    -- FSD ENROL-05: no duplicates</span>
+  <span class="c-idx">INDEX</span>  ix_enroll_student      <span class="c-comment">(student_id, status)       -- student's course list</span>
+  <span class="c-idx">INDEX</span>  ix_enroll_course       <span class="c-comment">(course_id, status)        -- course roster</span>
+  <span class="c-constraint">ON DELETE</span>  course_id <span class="c-constraint">RESTRICT</span>     <span class="c-comment">-- archive, never delete a course with enrollments</span>
+
+<span class="c-entity">sessions</span>
+  <span class="c-idx">UNIQUE</span> ux_sess_enroll_number  <span class="c-comment">(enrollment_id, session_number)</span>
+  <span class="c-idx">INDEX</span>  ix_sess_enroll_status  <span class="c-comment">(enrollment_id, status)    -- single-active-session check</span>
+  <span class="c-comment">-- partial index for the cleanup cron (FSD SESS-06):</span>
+  <span class="c-idx">INDEX</span>  ix_sess_abandoned      <span class="c-comment">(status) WHERE status = 'abandoned'</span>
+
+<span class="c-entity">lessons</span>
+  <span class="c-idx">UNIQUE</span> ux_lesson_session      <span class="c-comment">(session_id)   -- one lesson per session</span>
+  <span class="c-constraint">ON DELETE</span>  session_id <span class="c-constraint">CASCADE</span>    <span class="c-comment">-- failed session cleanup removes its lesson</span>
+
+<span class="c-entity">assessments</span>
+  <span class="c-idx">UNIQUE</span> ux_assess_lesson       <span class="c-comment">(lesson_id)</span>
+  <span class="c-constraint">ON DELETE</span>  lesson_id <span class="c-constraint">CASCADE</span>
+
+<span class="c-entity">assessment_responses</span>
+  <span class="c-idx">UNIQUE</span> ux_resp_q              <span class="c-comment">(assessment_id, session_id, question_index)</span>
+  <span class="c-idx">INDEX</span>  ix_resp_session        <span class="c-comment">(session_id)   -- gather all answers for a session</span>
+
+<span class="c-entity">session_history</span>          <span class="c-comment">-- IMMUTABLE after write (FSD HIST-01)</span>
+  <span class="c-idx">UNIQUE</span> ux_hist_session        <span class="c-comment">(session_id)</span>
+  <span class="c-idx">INDEX</span>  ix_hist_enroll_num     <span class="c-comment">(enrollment_id, session_number)  -- context assembly read</span>
+  <span class="c-comment">-- No ON DELETE cascade. History outlives sessions intentionally.
+  -- Enforced immutable at the application layer — no UPDATE/DELETE in any code path.</span></pre>
+    </div>
+    <div class="callout ct"><strong>The Critical Read Path</strong>The single most performance-sensitive query in the system is context assembly reading <code>session_history</code> for an enrollment (FSD HIST-04). The index <code>ix_hist_enroll_num</code> covers it exactly: filter by <code>enrollment_id</code>, order by <code>session_number</code> descending, take what the summarisation strategy needs. This query runs once per session generation and must never trigger a sequential scan.</div>
+  </div>
+
+  <div class="subsection" id="s5-2">
+    <div class="sub-header"><span class="sub-num">5.2</span><span class="sub-title">Migrations Strategy</span></div>
+    <table class="rtable">
+      <thead><tr><th>Rule</th><th>Detail</th></tr></thead>
+      <tbody>
+        <tr><td>Migration tool</td><td>Django's built-in migration framework. No third-party tool.</td></tr>
+        <tr><td>Where migrations run</td><td>As a Railway release-phase command on the Django service, before the new version receives traffic. Never inside the web process at startup.</td></tr>
+        <tr><td>Release command</td><td><code>python manage.py migrate --noinput</code> declared as the Railway pre-deploy command for the Django service.</td></tr>
+        <tr><td>Backwards compatibility</td><td>Each migration must be safe to run while the previous app version is still serving — additive changes first, destructive changes in a later deploy after code stops using the column.</td></tr>
+        <tr><td>CI check</td><td>CI runs <code>makemigrations --check --dry-run</code>; the build fails if a model change has no corresponding migration committed.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="s6">
+  <div class="section-header"><span class="sec-num">06</span><h2 class="sec-title">Backend Architecture — Django</h2></div>
+
+  <div class="subsection" id="s6-1">
+    <div class="sub-header"><span class="sub-num">6.1</span><span class="sub-title">Django Apps</span></div>
+    <p>Five Django apps, each owning a clear slice of the domain. Apps depend downward only — <code>sessions</code> may import from <code>courses</code> and <code>accounts</code>, but never the reverse.</p>
+    <table class="rtable">
+      <thead><tr><th>App</th><th>Owns</th><th>Key Classes</th><th>May Import</th></tr></thead>
+      <tbody>
+        <tr><td><code>accounts</code></td><td>Schools, users, auth, password flows</td><td>simplejwt config, /auth views, permission classes, password utilities</td><td>— (base)</td></tr>
+        <tr><td><code>courses</code></td><td>Course briefs, enrollment</td><td>CourseViewSet, EnrollmentViewSet</td><td>accounts</td></tr>
+        <tr><td><code>agent</code></td><td>Anthropic integration, prompts, parsing</td><td>AgentClient, prompt builders, parsers, validators</td><td>— (base, pure)</td></tr>
+        <tr><td><code>sessions</code></td><td>Orchestration, context, lessons, assessments</td><td>SessionOrchestrator, ContextAssembler, SessionStreamView</td><td>accounts, courses, agent</td></tr>
+        <tr><td><code>common</code></td><td>Shared utilities</td><td>Error envelope, pagination, structured logger</td><td>— (base)</td></tr>
+      </tbody>
+    </table>
+    <div class="callout cn"><strong>Why <code>agent</code> is a Pure App</strong>The <code>agent</code> app imports nothing from <code>accounts</code>, <code>courses</code>, or <code>sessions</code>. It receives plain data structures (a context dict) and returns plain data structures (a parsed Lesson object). It has no knowledge of Django models. This makes the AI integration independently testable — prompts can be exercised against fixture contexts with no database — and replaceable without touching domain logic.</div>
+  </div>
+
+  <div class="subsection" id="s6-2">
+    <div class="sub-header"><span class="sub-num">6.2</span><span class="sub-title">The Async Model</span></div>
+    <p>Django runs under ASGI. Most endpoints are ordinary synchronous DRF views — they are fast database reads and writes. Exactly one class of endpoint is async: session generation, because it holds a connection open for the duration of an Anthropic stream.</p>
+    <table class="rtable">
+      <thead><tr><th>Endpoint Class</th><th>View Type</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td>Account, course, enrollment, progress, assessment-answer</td><td>Sync DRF ViewSet</td><td>Sub-100ms database operations. Async adds complexity with no benefit.</td></tr>
+        <tr><td>Session generation (<code>POST /enrollments/{id}/sessions</code>)</td><td>Async view, StreamingHttpResponse</td><td>Holds an Anthropic stream for 15–30s. Must not occupy a worker thread for that duration.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout cw"><strong>Async/Sync ORM Discipline</strong>Inside the async session view, every database operation uses the async ORM (<code>await Model.objects.aget(...)</code>, <code>await obj.asave()</code>) or is wrapped in <code>sync_to_async</code>. A single synchronous ORM call inside the async view raises <code>SynchronousOnlyOperation</code> at runtime. The orchestrator exposes async methods only; its sync callers (none in MVP) would wrap it, not the reverse.</div>
+  </div>
+
+  <div class="subsection" id="s6-3">
+    <div class="sub-header"><span class="sub-num">6.3</span><span class="sub-title">Settings &amp; Environment</span></div>
+    <p>Settings are environment-driven. <code>settings.py</code> reads every deployment-specific value from the environment with no hardcoded fallbacks for secrets. Configuration differs only by environment variables — never by code branches.</p>
+    <table class="rtable">
+      <thead><tr><th>Variable</th><th>Purpose</th><th>Example / Note</th></tr></thead>
+      <tbody>
+        <tr><td><code>DJANGO_SECRET_KEY</code></td><td>Django cryptographic signing</td><td>Distinct per environment</td></tr>
+        <tr><td><code>DATABASE_URL</code></td><td>PostgreSQL connection (psycopg3)</td><td>Injected by Railway; private network host</td></tr>
+        <tr><td><code>ANTHROPIC_API_KEY</code></td><td>Anthropic authentication</td><td>Separate keys for staging vs production</td></tr>
+        <tr><td><code>ANTHROPIC_MODEL_VERSION</code></td><td>Model identifier for all agent calls</td><td>Changeable without a code deploy (FSD AGENT-03)</td></tr>
+        <tr><td><code>JWT_SIGNING_KEY</code></td><td>simplejwt token signing (may reuse DJANGO_SECRET_KEY)</td><td>—</td></tr>
+        <tr><td><code>JWT_ACCESS_LIFETIME</code> / <code>JWT_REFRESH_LIFETIME</code></td><td>Token lifetimes</td><td>e.g. 30 min / 7 days</td></tr>
+        <tr><td><code>EMAIL_HOST</code> / <code>EMAIL_*</code></td><td>SMTP backend for welcome &amp; password-reset mail</td><td>—</td></tr>
+        <tr><td><code>CORS_ALLOWED_ORIGINS</code></td><td>The Next.js service URL — the only allowed origin</td><td>Exact match, no wildcards</td></tr>
+        <tr><td><code>ALLOWED_HOSTS</code></td><td>Django host header allowlist</td><td>The Django service domain</td></tr>
+        <tr><td><code>AGENT_TIMEOUT_SECONDS</code></td><td>Hard ceiling on a generation call (FSD AGENT-07)</td><td>Default 30</td></tr>
+        <tr><td><code>LOG_LEVEL</code></td><td>Structured log verbosity</td><td>INFO in production</td></tr>
+      </tbody>
+    </table>
+    <div class="callout cc"><strong>The "No User-Facing HTML" Rule</strong>Per FSD Section 5.2, Django serves no HTML to end users — every role UI is Next.js. The Django admin is the one deliberate exception: it stays enabled for internal data inspection, which means <code>django.contrib.staticfiles</code> and a minimal <code>TEMPLATES</code> backend remain configured, because the admin needs them to render. Templates are configured through the <code>TEMPLATES</code> setting, not <code>INSTALLED_APPS</code>. The admin is never exposed publicly — it is reachable only over Railway's private network or behind a protected path.</div>
+  </div>
+</div>
+
+<div class="section" id="s7">
+  <div class="section-header"><span class="sec-num">07</span><h2 class="sec-title">API Contract</h2></div>
+  <p class="lead">This is the contract for boundary B2 — every call the Next.js frontend makes to the Django API. It is the most important interface in the system. Both sides are bound to it: Django serializers produce these shapes, and the zod schemas in <code>frontend/lib/schemas.ts</code> validate them on receipt.</p>
+
+  <div class="subsection" id="s7-1">
+    <div class="sub-header"><span class="sub-num">7.1</span><span class="sub-title">Conventions</span></div>
+    <table class="rtable">
+      <thead><tr><th>Aspect</th><th>Rule</th></tr></thead>
+      <tbody>
+        <tr><td>Base path</td><td>All endpoints under <code>/api/v1/</code>. The version prefix exists from day one.</td></tr>
+        <tr><td>Authentication</td><td>Every endpoint except <code>/auth/login</code> requires <code>Authorization: Bearer &lt;access_jwt&gt;</code>. No other anonymous endpoints.</td></tr>
+        <tr><td>Content type</td><td><code>application/json</code> for all request and response bodies, except the session SSE stream (<code>text/event-stream</code>).</td></tr>
+        <tr><td>IDs</td><td>All resource IDs are UUIDs, returned as strings.</td></tr>
+        <tr><td>Timestamps</td><td>ISO 8601 with timezone (UTC), e.g. <code>2026-05-25T14:30:00Z</code>.</td></tr>
+        <tr><td>Success codes</td><td><code>200</code> read/update, <code>201</code> create, <code>202</code> accepted (stream starting), <code>204</code> delete.</td></tr>
+        <tr><td>Error envelope</td><td>All errors return a consistent JSON shape (Section 14.1). Never a bare string or HTML.</td></tr>
+        <tr><td>Pagination</td><td>List endpoints return <code>{ results: [], count, next, previous }</code>. Page size 25.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection" id="s7-2">
+    <div class="sub-header"><span class="sub-num">7.2</span><span class="sub-title">Identity &amp; Auth</span></div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-post">POST</span><span class="ep-path">/api/v1/auth/login</span><span class="ep-auth">Public</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Accepts email and password, verifies against the stored hash, returns an access and refresh token (FSD AUTH-03). Invalid credentials or a deactivated account return <code>401</code> with a generic message that never reveals whether the email exists.</div>
+        <div class="ep-section"><div class="ep-section-label">Request</div><div class="ep-code"><pre>{ "email": "amara@school.edu", "password": "..." }</pre></div></div>
+        <div class="ep-section"><div class="ep-section-label">Response 200</div><div class="ep-code"><pre>{ "access": "&lt;jwt&gt;", "refresh": "&lt;jwt&gt;",
+  "force_password_change": false }</pre></div></div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-post">POST</span><span class="ep-path">/api/v1/auth/refresh</span><span class="ep-auth">Valid refresh token</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Exchanges a valid refresh token for a fresh access token (FSD AUTH-04). An invalid or expired refresh token returns <code>401</code>, forcing re-login.</div>
+        <div class="ep-section"><div class="ep-section-label">Request</div><div class="ep-code"><pre>{ "refresh": "&lt;jwt&gt;" }</pre></div></div>
+        <div class="ep-section"><div class="ep-section-label">Response 200</div><div class="ep-code"><pre>{ "access": "&lt;jwt&gt;" }</pre></div></div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-post">POST</span><span class="ep-path">/api/v1/auth/change-password</span><span class="ep-auth">Any authenticated</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Sets a new password and clears the <code>force_password_change</code> flag (FSD ACC-02). Required as the first action for any account created with a temporary password — the API rejects other requests from such a user with a code the frontend redirects on.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-get">GET</span><span class="ep-path">/api/v1/me</span><span class="ep-auth">Any authenticated</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Returns the current user's Paideia profile, resolved from the access token's user_id claim. The frontend calls this once after login to determine which role interface to route into. The user always already exists in the database — there is no lazy creation.</div>
+        <div class="ep-section"><div class="ep-section-label">Response 200</div><div class="ep-code"><pre>{
+  "id": "uuid",
+  "name": "Amara Okafor",
+  "email": "amara@school.edu",
+  "role": "student",
+  "school": { "id": "uuid", "name": "Lagos Model Secondary" },
+  "is_active": true
+}</pre></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection" id="s7-3">
+    <div class="sub-header"><span class="sub-num">7.3</span><span class="sub-title">Account Management</span></div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-post">POST</span><span class="ep-path">/api/v1/admin/users</span><span class="ep-auth">Admin only</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Creates a teacher or student. Writes the User row with role and school set, generates a temporary password, sets <code>force_password_change=True</code>, and sends the welcome email via the configured email backend (FSD ACC-01).</div>
+        <div class="ep-section"><div class="ep-section-label">Request</div><div class="ep-code"><pre>{ "name": "John Bello", "email": "john@school.edu", "role": "teacher" }</pre></div></div>
+        <div class="ep-section"><div class="ep-section-label">Response 201</div><div class="ep-code"><pre>{ "id": "uuid", "name": "John Bello", "email": "john@school.edu",
+  "role": "teacher", "is_active": true }</pre></div></div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-get">GET</span><span class="ep-path">/api/v1/admin/users</span><span class="ep-auth">Admin only</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Paginated list of all users in the admin's school with status (FSD ACC-04). Optional <code>?role=</code> and <code>?status=</code> filters.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-patch">PATCH</span><span class="ep-path">/api/v1/admin/users/{id}/deactivate</span><span class="ep-auth">Admin only</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Deactivates a user by setting <code>is_active=false</code> (FSD ACC-03). A deactivated user can no longer log in or refresh tokens. If the target is a teacher, the response includes their active courses so the admin UI can prompt for reassignment (FSD ACC-05). Courses are not modified by this call.</div>
+        <div class="ep-section"><div class="ep-section-label">Response 200</div><div class="ep-code"><pre>{ "id": "uuid", "is_active": false,
+  "affected_courses": [
+    { "id": "uuid", "title": "Biology Year 10", "enrolled_count": 28 }
+  ] }</pre></div></div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-post">POST</span><span class="ep-path">/api/v1/admin/courses/{id}/reassign</span><span class="ep-auth">Admin only</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Reassigns a course to a different active teacher (FSD ACC-06). The only operation that can change <code>teacher_id</code> on an active course. The new teacher immediately gains progress and enrollment access.</div>
+        <div class="ep-section"><div class="ep-section-label">Request</div><div class="ep-code"><pre>{ "new_teacher_id": "uuid" }</pre></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection" id="s7-4">
+    <div class="sub-header"><span class="sub-num">7.4</span><span class="sub-title">Courses</span></div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-post">POST</span><span class="ep-path">/api/v1/courses</span><span class="ep-auth">Teacher</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Creates a course brief. Created as <code>draft</code>. <code>teacher_id</code> is set to the requesting teacher — it cannot be set to anyone else (FSD BRIEF-07).</div>
+        <div class="ep-section"><div class="ep-section-label">Request</div><div class="ep-code"><pre>{
+  "title": "Biology — Year 10, Term 2",
+  "subject": "Biology",
+  "target_level": "Year 10 / Age 14-15",
+  "learning_outcomes": "Students will be able to ...",
+  "topic_sequence": "1. Cell biology  2. Genetics  3. Evolution ...",
+  "exam_context": "WAEC Biology — past topics include ...",
+  "special_instructions": "Do not cover evolution — teacher-led only.",
+  "approximate_lessons": 40
+}</pre></div></div>
+        <div class="ep-section"><div class="ep-section-label">Response 201</div><div class="ep-code"><pre>{ "id": "uuid", "status": "draft", ...all fields,
+  "teacher": { "id": "uuid", "name": "John Bello" } }</pre></div></div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-get">GET</span><span class="ep-path">/api/v1/courses</span><span class="ep-auth">Teacher / Admin</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Teachers see only their own courses. Admins see all courses in the school. Scoping is enforced by the <code>IsCourseOwner</code> queryset filter, not by a request parameter (FSD PROG-01).</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-patch">PATCH</span><span class="ep-path">/api/v1/courses/{id}</span><span class="ep-auth">Course owner</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Edits brief fields (FSD BRIEF-03). Any subset of editable fields. <code>teacher_id</code> and <code>status</code> are rejected here — they have dedicated endpoints. The response includes <code>has_active_sessions</code> so the frontend knows whether to have shown the edit warning.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-post">POST</span><span class="ep-path">/api/v1/courses/{id}/activate</span><span class="ep-auth">Course owner</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Transitions <code>draft → active</code>. Rejects with <code>422</code> if required fields fail minimum-length validation (FSD BRIEF-01).</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-post">POST</span><span class="ep-path">/api/v1/courses/{id}/archive</span><span class="ep-auth">Course owner / Admin</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Transitions <code>active → archived</code> (FSD BRIEF-05). Course owner or any admin in the school. No new sessions or enrollments after this; history preserved.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection" id="s7-5">
+    <div class="sub-header"><span class="sub-num">7.5</span><span class="sub-title">Enrollment</span></div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-post">POST</span><span class="ep-path">/api/v1/courses/{id}/enrollments</span><span class="ep-auth">Course owner / Admin</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Enrolls one or more students into the course (FSD ENROL-01/03). Teacher must own the course; admin may enroll into any course. Re-enrolling a previously unenrolled student reactivates the existing record (FSD ENROL-05).</div>
+        <div class="ep-section"><div class="ep-section-label">Request</div><div class="ep-code"><pre>{ "student_ids": ["uuid", "uuid", "uuid"] }</pre></div></div>
+        <div class="ep-section"><div class="ep-section-label">Response 201</div><div class="ep-code"><pre>{ "enrolled": 3, "reactivated": 1, "already_enrolled": 0 }</pre></div></div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-get">GET</span><span class="ep-path">/api/v1/courses/{id}/enrollments</span><span class="ep-auth">Course owner / Admin</span></div>
+      <div class="ep-body"><div class="ep-desc">Course roster — active enrollments with student name and session count.</div></div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-delete">DELETE</span><span class="ep-path">/api/v1/enrollments/{id}</span><span class="ep-auth">Course owner / Admin</span></div>
+      <div class="ep-body"><div class="ep-desc">Unenrolls a student (FSD ENROL-02). Sets enrollment <code>status=unenrolled</code>. Session history is retained — this is a soft delete, not a row deletion.</div></div>
+    </div>
+  </div>
+
+  <div class="subsection" id="s7-6">
+    <div class="sub-header"><span class="sub-num">7.6</span><span class="sub-title">Sessions — The Core Endpoints</span></div>
+    <p>These endpoints drive the core loop. The first is the only streaming endpoint in the system.</p>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-post">POST</span><span class="ep-path">/api/v1/enrollments/{id}/sessions</span><span class="ep-auth">Student (own enrollment)</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Starts or resumes a session. This is an SSE endpoint — it responds with <code>text/event-stream</code>, not JSON. If a non-complete session already exists it is resumed (the stored lesson is replayed, not regenerated, FSD SESS-01). Otherwise a new session is created and the lesson is generated and streamed token by token (FSD SESS-02). The assessment is generated concurrently server-side.</div>
+        <div class="ep-section"><div class="ep-section-label">Response — SSE event sequence</div><div class="ep-code"><pre><span class="c-comment"># Each line is one SSE message: "data: {json}\n\n"</span>
+data: { "event": "session_started", "session_id": "uuid",
+        "session_number": 8, "resumed": false }
+
+data: { "event": "lesson_meta", "lesson_title": "Osmosis",
+        "key_concepts": ["osmosis","gradient","membrane"],
+        "estimated_read_minutes": 6, "context_line": "Session 8 of ~40" }
+
+data: { "event": "token", "text": "## What is " }
+data: { "event": "token", "text": "Osmosis?\n\n" }
+<span class="c-comment"># ... many token events ...</span>
+
+data: { "event": "lesson_complete", "session_id": "uuid",
+        "blocks_url": "/api/v1/sessions/uuid/lesson" }
+
+data: { "event": "assessment_ready", "session_id": "uuid" }
+
+data: { "event": "done" }</pre></div></div>
+        <div class="ep-section"><div class="ep-section-label">Error during stream</div><div class="ep-code"><pre>data: { "event": "error", "code": "agent_failure",
+        "message": "Lesson generation failed. Please try again." }
+<span class="c-comment"># On this event the client returns the student to the course home.
+# The session row has been deleted server-side (FSD SESS-03).</span></pre></div></div>
+        <div class="ep-roles"><span class="role-tag rt-student">Student streams own lesson</span></div>
+      </div>
+    </div>
+    <div class="callout cw"><strong>Why <code>token</code> events stream raw markdown, but <code>blocks</code> are fetched separately</strong>During streaming, the agent emits the lesson as text — the frontend renders it progressively as raw markdown for the live "building" effect. Once <code>lesson_complete</code> fires, the server has parsed the full response into the structured block array (text / interactive / callout). The client then fetches the parsed blocks via <code>GET /sessions/{id}/lesson</code> and swaps the streamed view for the fully rendered block view, including interactive iframes. This two-stage approach gives both the live feel and the structured final render (FSD REND-04).</div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-get">GET</span><span class="ep-path">/api/v1/sessions/{id}/lesson</span><span class="ep-auth">Session's student / Course owner</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Returns the parsed, structured lesson — the block array the Rendering Engine consumes. Also used for re-reading past lessons (FSD PROG-05) and teacher diagnostic review (FSD PROG-03).</div>
+        <div class="ep-section"><div class="ep-section-label">Response 200</div><div class="ep-code"><pre>{
+  "lesson_title": "Osmosis and Diffusion",
+  "key_concepts": ["osmosis", "concentration gradient", "membrane"],
+  "estimated_read_minutes": 6,
+  "has_interactive": true,
+  "blocks": [
+    { "type": "text", "content": "## What is Osmosis?\n\n..." },
+    { "type": "interactive", "description": "Gradient simulation",
+      "height": 380, "html": "&lt;!DOCTYPE html&gt;..." },
+    { "type": "callout", "variant": "definition", "content": "..." }
+  ]
+}</pre></div></div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-get">GET</span><span class="ep-path">/api/v1/sessions/{id}/assessment</span><span class="ep-auth">Session's student</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Returns the assessment questions for the session. Correct answers and explanations are NOT included in this response — they are withheld until each answer is submitted (FSD ASMT-04). Returns <code>409</code> if the assessment could not be generated after the mandated retry (FSD AGENT-06); the client then shows the "assessment unavailable" state.</div>
+        <div class="ep-section"><div class="ep-section-label">Response 200</div><div class="ep-code"><pre>{
+  "assessment_id": "uuid",
+  "questions": [
+    { "index": 0, "question_text": "...", "concept_tag": "osmosis",
+      "options": [ {"id":"A","text":"..."}, {"id":"B","text":"..."},
+                   {"id":"C","text":"..."}, {"id":"D","text":"..."} ] }
+  ]
+}</pre></div></div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-post">POST</span><span class="ep-path">/api/v1/sessions/{id}/responses</span><span class="ep-auth">Session's student</span></div>
+      <div class="ep-body">
+        <div class="ep-desc">Submits one answer. Posted immediately on each confirmation, never batched (FSD REND-06). The response reveals correctness and explanations for that question only. Submitting the final question's answer triggers session completion: the orchestrator writes the immutable history record and sets <code>status=complete</code> (FSD SESS-05).</div>
+        <div class="ep-section"><div class="ep-section-label">Request</div><div class="ep-code"><pre>{ "question_index": 0, "selected_option": "B" }</pre></div></div>
+        <div class="ep-section"><div class="ep-section-label">Response 200</div><div class="ep-code"><pre>{
+  "question_index": 0,
+  "is_correct": false,
+  "correct_option_id": "A",
+  "correct_explanation": "Osmosis specifically refers to water ...",
+  "wrong_explanation": "Option B describes diffusion of solutes ...",
+  "session_complete": false,
+  "session_summary": null
+}
+<span class="c-comment"># On the final question, session_complete=true and session_summary
+# carries score, outcome, and per-concept correctness.</span></pre></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection" id="s7-7">
+    <div class="sub-header"><span class="sub-num">7.7</span><span class="sub-title">Progress</span></div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-get">GET</span><span class="ep-path">/api/v1/courses/{id}/progress</span><span class="ep-auth">Course owner / Admin</span></div>
+      <div class="ep-body"><div class="ep-desc">The teacher progress table (FSD PROG-01) — one row per enrolled student with session count, last session date, and most recent outcome. Returns <code>404</code> if the requesting teacher does not own the course — the course is outside their visible scope (FSD AC-13, PROG-03; see §14.1).</div></div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-get">GET</span><span class="ep-path">/api/v1/enrollments/{id}/history</span><span class="ep-auth">Enrollment's student / Course owner / Admin</span></div>
+      <div class="ep-body"><div class="ep-desc">Ordered session history for one enrollment (FSD PROG-02, PROG-05). Student sees their own; teacher sees it for their own courses only.</div></div>
+    </div>
+    <div class="endpoint">
+      <div class="ep-header"><span class="ep-method m-get">GET</span><span class="ep-path">/api/v1/students/me/courses</span><span class="ep-auth">Student</span></div>
+      <div class="ep-body"><div class="ep-desc">The student home screen (FSD PROG-04) — enrolled active courses with session counter and last session date.</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="s8">
+  <div class="section-header"><span class="sec-num">08</span><h2 class="sec-title">Authentication &amp; Authorization</h2></div>
+  <p class="lead">Authentication answers "who is this request from" and authorization answers "may they do this" — both owned by Django. simplejwt handles the first; DRF permission classes handle the second. They are separate concerns in separate code, but no longer separate systems.</p>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">8.1</span><span class="sub-title">The Token Flow</span></div>
+    <div class="diagram">
+      <div class="dg-label">Authentication Flow — Login to Authorized Request</div>
+      <div class="dg-step"><span class="dg-step-num">1</span><span class="dg-step-text">User submits email + password to <code>POST /auth/login</code> (boundary B2). Django verifies against the stored hash and returns an access token and a refresh token.</span></div>
+      <div class="dg-step"><span class="dg-step-num">2</span><span class="dg-step-text">Next.js stores the tokens and attaches the access token as <code>Authorization: Bearer ...</code> on every subsequent call to the Django API (boundary B2).</span></div>
+      <div class="dg-step"><span class="dg-step-num">3</span><span class="dg-step-text">simplejwt's <code>JWTAuthentication</code> (DRF default auth class) verifies the token's signature and expiry locally — no database hit for the auth check itself.</span></div>
+      <div class="dg-step"><span class="dg-step-num">4</span><span class="dg-step-text">The token's <code>user_id</code> claim resolves <code>request.user</code> to the existing User row. The user always already exists — accounts are admin-created (FSD ACC-01), so there is no lazy creation.</span></div>
+      <div class="dg-step"><span class="dg-step-num">5</span><span class="dg-step-text">DRF permission classes run against <code>request.user.role</code> and the target object's <code>school_id</code> / <code>teacher_id</code>. The view executes only if all pass.</span></div>
+      <div class="dg-step"><span class="dg-step-num">6</span><span class="dg-step-text">When the access token expires, the client silently calls <code>POST /auth/refresh</code> with the refresh token to obtain a new access token, without forcing the user to log in again.</span></div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">8.2</span><span class="sub-title">Permission Classes</span></div>
+    <p>Authorization is expressed entirely through DRF permission classes — never as inline <code>if</code> checks in view bodies. Four classes cover the whole system.</p>
+    <table class="rtable">
+      <thead><tr><th>Class</th><th>Grants when</th><th>Applied to</th></tr></thead>
+      <tbody>
+        <tr><td><code>IsAdmin</code></td><td><code>user.role == 'admin'</code></td><td>All <code>/admin/*</code> endpoints</td></tr>
+        <tr><td><code>IsTeacher</code></td><td><code>user.role == 'teacher'</code></td><td>Course creation</td></tr>
+        <tr><td><code>IsSameSchool</code></td><td><code>obj.school_id == user.school_id</code></td><td>Every object-level access — universal guard (FSD AUTH-05)</td></tr>
+        <tr><td><code>IsCourseOwnerOrAdmin</code></td><td><code>course.teacher_id == user.id</code> OR <code>user.role == 'admin'</code></td><td>Course edit, enrollment, progress (FSD PROG-01, ENROL-03)</td></tr>
+      </tbody>
+    </table>
+    <div class="callout cc"><strong>Queryset Scoping, Not Just Object Permission</strong>Object-level permissions block access to a known object. But a list endpoint must never even return objects the user cannot see. Every list viewset overrides <code>get_queryset()</code> to filter to the user's school, and for teachers, to their own courses. A teacher requesting <code>GET /courses</code> receives a queryset already filtered to <code>teacher_id = self</code> — the permission class is the second line of defence, not the first.</div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">8.3</span><span class="sub-title">Frontend Route Protection</span></div>
+    <p>Next.js mirrors the authorization model at the routing layer. This is a UX guard — the API is the real enforcement — but it prevents a student ever seeing an admin screen shell.</p>
+    <table class="rtable">
+      <thead><tr><th>Route group</th><th>Guard</th></tr></thead>
+      <tbody>
+        <tr><td><code>(auth)/*</code></td><td>Public. The Paideia-styled sign-in page (and password-change / reset screens).</td></tr>
+        <tr><td><code>admin/*</code></td><td>Layout checks <code>role === 'admin'</code> from <code>/me</code>; redirects otherwise.</td></tr>
+        <tr><td><code>teacher/*</code></td><td>Layout checks <code>role === 'teacher'</code>.</td></tr>
+        <tr><td><code>student/*</code></td><td>Layout checks <code>role === 'student'</code>.</td></tr>
+      </tbody>
+    </table>
+    <p>The Next.js middleware (<code>middleware.ts</code>) protects all non-auth routes — a request with no stored access token is redirected to <code>/sign-in</code> before any layout runs. Role is read from the token (or <code>/me</code>) at the layout level.</p>
+  </div>
+</div>
+
+<div class="section" id="s9">
+  <div class="section-header"><span class="sec-num">09</span><h2 class="sec-title">AI Agent Integration Layer</h2></div>
+  <p class="lead">The <code>agent</code> app is the boundary B3 implementation. It is a pure module — given a context dictionary, it returns a validated <code>Lesson</code> or <code>Assessment</code> object. It knows nothing of Django models, HTTP, or sessions.</p>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">9.1</span><span class="sub-title">Internal Structure</span></div>
+    <table class="rtable">
+      <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><code>client.py</code></td><td>Wraps <code>AsyncAnthropic</code>. Exposes <code>stream_lesson(context)</code> (async generator of text) and <code>generate_assessment(lesson)</code> (async, returns parsed object). Reads <code>ANTHROPIC_MODEL_VERSION</code> and <code>AGENT_TIMEOUT_SECONDS</code> from settings.</td></tr>
+        <tr><td><code>prompts.py</code></td><td>Versioned prompt templates. Each template has a version string logged with every call. Prompt changes are version bumps.</td></tr>
+        <tr><td><code>parsers.py</code></td><td>Extracts <code>&lt;plan&gt;</code>, <code>&lt;blocks&gt;</code>, <code>&lt;meta&gt;</code> tags from the raw lesson response. Parses the assessment JSON. Pure string functions.</td></tr>
+        <tr><td><code>validators.py</code></td><td>Validates parsed output against pydantic schemas. Validates interactive-block HTML (complete document, no disallowed calls, ≤15k chars, CDN whitelist) per FSD AGENT-05.</td></tr>
+        <tr><td><code>schemas.py</code></td><td>Pydantic models — <code>Lesson</code>, <code>TextBlock</code>, <code>InteractiveBlock</code>, <code>CalloutBlock</code>, <code>Assessment</code>, <code>Question</code>. The single source of truth for output shape.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">9.2</span><span class="sub-title">Lesson Generation — Internal Sequence</span></div>
+    <div class="diagram">
+      <div class="dg-label">agent.stream_lesson(context) — Internal Flow</div>
+      <div class="dg-step"><span class="dg-step-num">1</span><span class="dg-step-text"><code>prompts.build_lesson_prompt(context)</code> assembles the system prompt from the context dict (course brief + summarised history).</span></div>
+      <div class="dg-step"><span class="dg-step-num">2</span><span class="dg-step-text"><code>client</code> opens <code>AsyncAnthropic.messages.stream(...)</code> with the configured model. An <code>asyncio.wait_for</code> wraps it at <code>AGENT_TIMEOUT_SECONDS</code>.</span></div>
+      <div class="dg-step"><span class="dg-step-num">3</span><span class="dg-step-text">Each text delta is yielded upward to the caller (the orchestrator) AND accumulated into a full-response buffer.</span></div>
+      <div class="dg-step"><span class="dg-step-num">4</span><span class="dg-step-text">On stream end, <code>parsers.parse_lesson(buffer)</code> extracts the three tag sections.</span></div>
+      <div class="dg-step"><span class="dg-step-num">5</span><span class="dg-step-text"><code>validators.validate_lesson(...)</code> checks against the pydantic <code>Lesson</code> schema. Each interactive block's HTML is validated; a failing block is replaced with a text fallback block, not rejected wholesale (FSD AGENT-05).</span></div>
+      <div class="dg-step"><span class="dg-step-num">6</span><span class="dg-step-text">A validated <code>Lesson</code> object is returned to the orchestrator alongside the raw response and the plan text for storage.</span></div>
+    </div>
+    <div class="callout cw"><strong>Parse Failure Handling</strong>If step 4 or 5 fails — the model returned output that cannot be parsed into valid blocks — the agent raises <code>AgentParseError</code>. The orchestrator catches it, treats it identically to an API failure (delete the session, emit the SSE <code>error</code> event), and logs the full raw response for prompt debugging. A lesson is never delivered from an unparseable response (FSD AGENT-04).</div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">9.3</span><span class="sub-title">Concurrent Assessment Generation</span></div>
+    <p>The assessment call runs concurrently with lesson streaming so it is ready by the time the student finishes reading (FSD ASMT-01). The orchestrator dispatches it as an <code>asyncio</code> task at the moment lesson streaming begins.</p>
+    <div class="codeblock">
+      <div class="cb-label">orchestrator.py — concurrent dispatch (simplified)</div>
+      <pre>
+<span class="c-kw">async def</span> <span class="c-fn">run_generation</span>(session, context):
+    <span class="c-comment"># Assessment depends on the finished lesson, so it is dispatched</span>
+    <span class="c-comment"># as a task that internally awaits the lesson result.</span>
+    lesson_holder = {}
+
+    <span class="c-kw">async def</span> <span class="c-fn">assessment_task</span>():
+        lesson = <span class="c-kw">await</span> lesson_ready.wait_and_get()
+        <span class="c-comment"># FSD AGENT-06: a malformed response triggers exactly one retry.</span>
+        <span class="c-comment"># 'unavailable' only after a second consecutive failure.</span>
+        <span class="c-kw">for</span> attempt <span class="c-kw">in</span> (<span class="c-str">1</span>, <span class="c-str">2</span>):
+            <span class="c-kw">try</span>:
+                assessment = <span class="c-kw">await</span> agent.generate_assessment(lesson)
+                <span class="c-kw">await</span> store_assessment(session, assessment)
+                <span class="c-kw">return</span>
+            <span class="c-kw">except</span> (AgentError, AgentParseError):
+                <span class="c-kw">if</span> attempt == <span class="c-str">2</span>:
+                    <span class="c-kw">await</span> mark_assessment_unavailable(session)  <span class="c-comment"># FSD AGENT-06</span>
+                <span class="c-comment"># attempt 1 falls through to the retry</span>
+
+    task = asyncio.create_task(<span class="c-fn">assessment_task</span>())
+
+    <span class="c-comment"># stream the lesson — yields tokens to the SSE response</span>
+    <span class="c-kw">async for</span> token <span class="c-kw">in</span> agent.stream_lesson(context):
+        <span class="c-kw">yield</span> token
+    lesson = <span class="c-kw">await</span> finalize_and_store_lesson(session, ...)
+    lesson_ready.set(lesson)        <span class="c-comment"># unblocks assessment_task</span>
+
+    <span class="c-kw">await</span> task                       <span class="c-comment"># ensure assessment finishes before 'done'</span></pre>
+    </div>
+    <div class="callout cn"><strong>Failure Isolation</strong>The assessment task has its own try/except. An assessment failure never aborts the lesson — the student still receives a complete lesson and simply sees the "assessment unavailable" state. Conversely, a lesson failure happens before the assessment can use the lesson, so the assessment task is cancelled cleanly. The two failure domains do not contaminate each other.</div>
+  </div>
+</div>
+
+<div class="section" id="s10">
+  <div class="section-header"><span class="sec-num">10</span><h2 class="sec-title">Streaming Pipeline</h2></div>
+  <p class="lead">The streaming pipeline is the most technically intricate path in the system. It connects four components across three boundaries: the browser's <code>fetch()</code> stream reader, the Django async view, the agent's Anthropic stream, and the PostgreSQL writes — all within a single long-lived HTTP response.</p>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">10.1</span><span class="sub-title">End-to-End Pipeline</span></div>
+    <div class="diagram">
+      <div class="dg-label">Lesson Streaming — Full Pipeline</div>
+      <div class="dg-row"><div class="dg-box b-client">fetch() reader (browser)</div><div class="dg-arr">→</div><div class="dg-box b-client">Next.js route</div><div class="dg-arr">→</div><div class="dg-box b-sys">Django async view</div></div>
+      <div style="margin:6px 0 6px 30px;color:#a0a09c;">↓ view delegates to orchestrator.run_generation()</div>
+      <div class="dg-row"><div class="dg-box b-sys">SessionOrchestrator</div><div class="dg-arr">→</div><div class="dg-box b-ai">agent.stream_lesson()</div><div class="dg-arr">→</div><div class="dg-box b-ext">Anthropic stream</div></div>
+      <div style="margin:6px 0 6px 30px;color:#a0a09c;">↓ each token flows back up and out as an SSE 'token' event</div>
+      <div class="dg-row"><div class="dg-box b-ext">Anthropic</div><div class="dg-arr">→ token →</div><div class="dg-box b-ai">agent</div><div class="dg-arr">→</div><div class="dg-box b-sys">orchestrator</div><div class="dg-arr">→</div><div class="dg-box b-client">SSE → browser</div></div>
+      <div style="margin:6px 0 6px 30px;color:#a0a09c;">↓ on stream end</div>
+      <div class="dg-row"><div class="dg-box b-sys">parse + validate</div><div class="dg-arr">→</div><div class="dg-box b-store">store lesson</div><div class="dg-arr">→</div><div class="dg-box b-client">SSE 'lesson_complete'</div></div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">10.2</span><span class="sub-title">Step Sequence</span></div>
+    <div class="diagram">
+      <div class="dg-label">POST /enrollments/{id}/sessions — Step by Step</div>
+      <div class="dg-step"><span class="dg-step-num">1</span><span class="dg-step-text">Async view authenticates the request and loads the enrollment with <code>await ...aget()</code>. Verifies the requesting student owns the enrollment.</span></div>
+      <div class="dg-step"><span class="dg-step-num">2</span><span class="dg-step-text">Orchestrator checks for an existing non-complete session. <b>If found</b> → emit <code>session_started (resumed:true)</code>, replay the stored lesson, skip generation. <b>If not</b> → continue.</span></div>
+      <div class="dg-step"><span class="dg-step-num">3</span><span class="dg-step-text">Create the <code>Session</code> row with <code>status=generating</code>. Emit <code>session_started</code>.</span></div>
+      <div class="dg-step"><span class="dg-step-num">4</span><span class="dg-step-text"><code>ContextAssembler</code> reads the course brief and the summarised <code>session_history</code> for this enrollment, builds the context dict.</span></div>
+      <div class="dg-step"><span class="dg-step-num">5</span><span class="dg-step-text">Dispatch the concurrent assessment task (Section 9.3). The <code>IncrementalLessonParser</code> begins consuming the raw token stream; once the <code>&lt;meta&gt;</code> section is parsed, emit <code>lesson_meta</code>.</span></div>
+      <div class="dg-step"><span class="dg-step-num">6</span><span class="dg-step-text">Stream lesson content — the parser emits <b>only clean text-block markdown</b> as SSE <code>token</code> events; the <code>&lt;plan&gt;</code> and JSON scaffolding are suppressed and never reach the client. A buffer accumulates the full raw response.</span></div>
+      <div class="dg-step"><span class="dg-step-num">7</span><span class="dg-step-text">On stream end: parse + validate the full raw buffer into the block array (Section 9.2). Persist the <code>Lesson</code> row including blocks, plan, prompt_context, raw_response. Set <code>status=active</code>.</span></div>
+      <div class="dg-step"><span class="dg-step-num">8</span><span class="dg-step-text">Emit <code>lesson_complete</code> with the <code>blocks_url</code>. Await the assessment task. Emit <code>assessment_ready</code> (or the unavailable state). Emit <code>done</code>. Close the stream. The session stays <code>active</code> while the student reads.</span></div>
+      <div class="dg-step"><span class="dg-step-num">9</span><span class="dg-step-text">When the student starts the assessment — first question fetch or first answer POST — the orchestrator transitions the session to <code>assessing</code> (FSD SESS-04). A browser close in this state makes the session <code>abandoned</code> and resumable.</span></div>
+      <div class="dg-step"><span class="dg-step-num">10</span><span class="dg-step-text">On the final answer, the orchestrator writes the immutable history row and sets <code>status=complete</code> (FSD SESS-05).</span></div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">10.3</span><span class="sub-title">Pipeline Hazards &amp; Mitigations</span></div>
+    <table class="rtable">
+      <thead><tr><th>Hazard</th><th>Mitigation</th></tr></thead>
+      <tbody>
+        <tr><td>Proxy buffers the stream — student sees nothing then everything at once</td><td><code>X-Accel-Buffering: no</code> and <code>Cache-Control: no-cache</code> headers on the StreamingHttpResponse. Confirmed against Railway's proxy during the first deploy.</td></tr>
+        <tr><td>Client disconnects mid-stream (closes tab)</td><td>The async generator detects the broken connection on the next yield. Generation continues to completion server-side so the lesson is still stored — the resumed session (step 2) will replay it. No orphaned <code>generating</code> rows.</td></tr>
+        <tr><td>Anthropic call exceeds timeout</td><td><code>asyncio.wait_for</code> at <code>AGENT_TIMEOUT_SECONDS</code> raises <code>TimeoutError</code> → treated as agent failure → session deleted, <code>error</code> event emitted (FSD AGENT-07).</td></tr>
+        <tr><td>Database write fails after a successful generation</td><td>The lesson is not delivered. <code>error</code> event emitted, session deleted. Generation is idempotent on retry — a fresh session starts clean (FSD AGENT-08).</td></tr>
+        <tr><td>Two rapid session-start requests (double-click)</td><td>Step 2's existing-session check plus the <code>ux_sess_enroll_number</code> unique constraint. The second request resumes the first's session rather than creating a duplicate.</td></tr>
+        <tr><td>Worker restart mid-stream</td><td>Stream dies; client receives connection close without <code>done</code>. Client treats absence of <code>done</code> as failure and returns to course home. The half-written session is a stale <code>generating</code> row, swept by the daily cleanup task — which sweeps both stale <code>generating</code> and old <code>abandoned</code> rows (FSD SESS-06).</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="s11">
+  <div class="section-header"><span class="sec-num">11</span><h2 class="sec-title">Frontend Architecture — Next.js</h2></div>
+  <p class="lead">Next.js App Router. Three role-scoped route groups, a typed API client wrapping boundary B2, and the Rendering Engine (Section 12). The frontend holds no business logic — it renders state and calls the API.</p>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">11.1</span><span class="sub-title">The Typed API Client</span></div>
+    <p><code>lib/api.ts</code> is the single place the frontend talks to Django. No component calls <code>fetch</code> directly. The client attaches the stored access token as a Bearer header, transparently refreshes it via <code>/auth/refresh</code> on a <code>401</code>, sends and receives JSON, and validates every response against a zod schema from <code>lib/schemas.ts</code> before returning it.</p>
+    <div class="callout cn"><strong>Zod as the Contract Mirror</strong>The zod schemas in <code>lib/schemas.ts</code> are the frontend's copy of the API contract from Section 7. When the API client validates a response, it is asserting the contract held. A backend change that alters a response shape without a matching zod update fails loudly at the first call in development — not silently three components deep. This is how the monorepo's "change both sides together" rule is enforced in practice.</div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">11.2</span><span class="sub-title">The Stream Client</span></div>
+    <p><code>lib/stream.ts</code> handles the one streaming endpoint. It cannot use the browser <code>EventSource</code> API — <code>EventSource</code> is GET-only and exposes no way to set an HTTP method or body, while the session endpoint is a state-creating <code>POST</code>. Instead it issues a <code>fetch()</code> with the Bearer JWT and reads the response body as a <code>ReadableStream</code>, decoding the SSE-formatted frames itself. It exposes a typed event stream so the student lesson page reacts to each event from Section 7.6 — <code>session_started</code>, <code>lesson_meta</code>, <code>token</code>, <code>lesson_complete</code>, <code>assessment_ready</code>, <code>error</code>, <code>done</code> — without parsing raw frames.</p>
+    <div class="callout cn" style="margin-bottom:16px;"><strong>Why fetch + ReadableStream, not EventSource</strong>The session endpoint is <code>POST /enrollments/{id}/sessions</code> — correct REST for an action that creates a session. <code>EventSource</code> can only issue GET requests, so it cannot open this endpoint at all. The <code>fetch()</code> + <code>ReadableStream</code> reader pattern supports POST, custom headers (the Bearer JWT), and the same incremental consumption EventSource would give. It is the standard approach for an authenticated, body-carrying server stream.</div>
+    <table class="rtable">
+      <thead><tr><th>Stream event</th><th>Frontend reaction</th></tr></thead>
+      <tbody>
+        <tr><td><code>session_started</code></td><td>Show the lesson shell. If <code>resumed</code>, skip straight to fetching stored blocks.</td></tr>
+        <tr><td><code>lesson_meta</code></td><td>Render the lesson header — title, read time, key-concepts preview, context line (FSD REND-03, PROG-06).</td></tr>
+        <tr><td><code>token</code></td><td>Append clean text-block markdown to the live buffer; render progressively. Only text streams live — interactive blocks arrive via the block fetch on completion (FSD REND-04).</td></tr>
+        <tr><td><code>lesson_complete</code></td><td>Fetch <code>GET /sessions/{id}/lesson</code>; swap the streamed markdown for the structured block render, including interactive iframes.</td></tr>
+        <tr><td><code>assessment_ready</code></td><td>Enable the "Start Assessment" button.</td></tr>
+        <tr><td><code>error</code></td><td>Show the error state; route back to course home (FSD AC-09).</td></tr>
+        <tr><td><code>done</code></td><td>Release the stream reader. Streaming complete.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">11.3</span><span class="sub-title">State Management</span></div>
+    <p>No global state library. State is local and scoped: React component state for UI, a lightweight auth context holding the current user and tokens, and server-fetched data held in the component that needs it. The assessment engine is the only component with non-trivial state — a state machine (Section 12.4) implemented with <code>useReducer</code>. Tokens are held in memory with the refresh token in an <code>HttpOnly</code> cookie where the deployment allows; no lesson or assessment data uses browser storage.</p>
+  </div>
+</div>
+
+<div class="section" id="s12">
+  <div class="section-header"><span class="sec-num">12</span><h2 class="sec-title">Rendering Engine — Implementation</h2></div>
+  <p class="lead">The Rendering Engine (FSD Module M8) consumes the structured lesson block array from <code>GET /sessions/{id}/lesson</code> and produces the student's lesson experience. It is three renderers behind one block router. This section specifies their implementation and how they interface with the lesson data.</p>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">12.1</span><span class="sub-title">Block Router</span></div>
+    <p><code>LessonRenderer.tsx</code> receives <code>blocks: LessonBlock[]</code> and maps each to its renderer by <code>type</code>. Unknown types are skipped silently (FSD REND-01) — this keeps the frontend forward-compatible with future block types a newer prompt version might emit.</p>
+    <table class="rtable">
+      <thead><tr><th>Block <code>type</code></th><th>Renderer Component</th><th>Mechanism</th></tr></thead>
+      <tbody>
+        <tr><td><code>text</code></td><td><code>TextBlock.tsx</code></td><td>react-markdown + remark/rehype plugin chain</td></tr>
+        <tr><td><code>callout</code></td><td><code>CalloutBlock.tsx</code></td><td>Styled container by <code>variant</code>, markdown body</td></tr>
+        <tr><td><code>interactive</code></td><td><code>InteractiveBlock.tsx</code></td><td>Sandboxed <code>iframe</code> via <code>srcDoc</code></td></tr>
+        <tr><td><i>unknown</i></td><td>—</td><td>Returns <code>null</code>, logged client-side</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">12.2</span><span class="sub-title">Renderer 1 — Text &amp; Callout</span></div>
+    <p>Markdown is rendered with a fixed plugin chain: <code>remark-math</code> + <code>rehype-katex</code> (equations for maths, physics, chemistry), <code>rehype-highlight</code> (code blocks for CS), <code>remark-gfm</code> (tables, lists). KaTeX CSS is loaded globally in the root layout — never lazily — so the first equation in a lesson renders without a flash of unstyled math (FSD REND-07). Callout blocks wrap the same markdown renderer in a variant-styled container (definition / note / example / warning).</p>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">12.3</span><span class="sub-title">Renderer 2 — Interactive Sandbox</span></div>
+    <p>The interactive block's <code>html</code> string is injected into an <code>iframe</code> via <code>srcDoc</code> with <code>sandbox="allow-scripts"</code> and no <code>allow-same-origin</code>. The iframe is a sealed execution environment with no access to the parent page, cookies, or any other student's data. This is the exact mechanism specified in FSD Section 13.4.</p>
+    <table class="rtable">
+      <thead><tr><th>Attribute</th><th>Value</th><th>Effect</th></tr></thead>
+      <tbody>
+        <tr><td><code>srcDoc</code></td><td>The block's <code>html</code> string</td><td>Renders the self-contained document</td></tr>
+        <tr><td><code>sandbox</code></td><td><code>allow-scripts</code></td><td>JS runs; everything else denied</td></tr>
+        <tr><td><i>omitted</i></td><td><code>allow-same-origin</code></td><td>Iframe cannot reach the parent — the key security property</td></tr>
+        <tr><td>CSP meta tag</td><td>Injected into the HTML string at server-side validation</td><td>A real <code>&lt;meta http-equiv="Content-Security-Policy"&gt;</code> restricting script-src to the CDN whitelist. The non-standard iframe <code>csp</code> attribute is NOT used — it is not implemented in shipping browsers.</td></tr>
+        <tr><td>postMessage handshake</td><td>Generated HTML posts <code>paideia:ready</code> on init</td><td>Parent shows the text fallback if no handshake arrives within 4s. Replaces <code>onError</code>, which does not fire for srcDoc content.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout cw" style="margin-top:16px;"><strong>Two Mechanisms the Naive Design Got Wrong</strong>An earlier draft listed an iframe <code>csp</code> attribute and an <code>onError</code> fallback. Neither works: the iframe <code>csp</code> attribute came from a never-standardised proposal and no shipping browser implements it; and <code>onError</code> does not fire for <code>srcDoc</code> content — there is no network load to fail, and JS errors inside a sandbox do not cross to the parent. The corrected mechanisms are an injected CSP <code>&lt;meta&gt;</code> tag (real, travels with the stored HTML) and a <code>postMessage</code> readiness handshake with a 4-second timeout. Both are reflected in the FSD InteractiveBlock implementation.</div>
+    <div class="callout ct"><strong>Three-Layer Trust</strong>The iframe sandbox is the runtime guarantee — even hostile generated JS cannot escape it. Server-side HTML validation (Section 9.2, FSD AGENT-05) is the storage-time guarantee — malformed or oversized blocks never reach the database. The postMessage handshake is the third layer: a block that stores cleanly but fails to initialise in the browser still degrades to a text fallback rather than showing broken, because the absence of a <code>paideia:ready</code> message within the timeout triggers the fallback.</div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">12.4</span><span class="sub-title">Renderer 3 — Assessment Engine</span></div>
+    <p><code>AssessmentEngine.tsx</code> is a <code>useReducer</code> state machine. It is not a renderer of AI output — it is a structured UI driven by the assessment data from <code>GET /sessions/{id}/assessment</code> and writing to <code>POST /sessions/{id}/responses</code>.</p>
+    <table class="rtable">
+      <thead><tr><th>State</th><th>Renders</th><th>Transition</th></tr></thead>
+      <tbody>
+        <tr><td><code>IDLE</code></td><td>"Start Assessment" button</td><td>→ <code>ANSWERING</code> on click</td></tr>
+        <tr><td><code>ANSWERING</code></td><td>Question N, four options, Confirm button</td><td>→ <code>REVEALED</code> on confirm — posts the answer immediately (FSD REND-06)</td></tr>
+        <tr><td><code>REVEALED</code></td><td>Correct/incorrect, explanations</td><td>→ <code>ANSWERING</code> (next) or → <code>COMPLETE</code> (last)</td></tr>
+        <tr><td><code>COMPLETE</code></td><td>Session summary — score, per-concept breakdown</td><td>Terminal</td></tr>
+      </tbody>
+    </table>
+    <p>Each answer is POSTed on confirmation, and the API response carries the correctness reveal. Because answers are never batched, a browser close after question 2 of 4 leaves those two answers persisted server-side; on return the resumed session restores the engine to question 3 (FSD SESS-04, REND-06).</p>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">12.5</span><span class="sub-title">Rendering Engine Data Interface</span></div>
+    <p>The Rendering Engine's entire input is the lesson block array and the assessment object. It interfaces with the rest of the system through exactly two API responses — it has no other dependency.</p>
+    <table class="rtable">
+      <thead><tr><th>Input</th><th>Source</th><th>Consumed by</th></tr></thead>
+      <tbody>
+        <tr><td>Lesson block array</td><td><code>GET /sessions/{id}/lesson</code></td><td>LessonRenderer → three renderers</td></tr>
+        <tr><td>Live token stream</td><td>SSE <code>token</code> events</td><td>Progressive markdown view (pre-block-swap)</td></tr>
+        <tr><td>Assessment questions</td><td><code>GET /sessions/{id}/assessment</code></td><td>AssessmentEngine</td></tr>
+        <tr><td>Answer reveal</td><td><code>POST /sessions/{id}/responses</code> response</td><td>AssessmentEngine <code>REVEALED</code> state</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="s13">
+  <div class="section-header"><span class="sec-num">13</span><h2 class="sec-title">Interface Contracts</h2></div>
+  <p class="lead">This section makes the governing principle concrete. Each of the four boundaries from Section 1.1 is specified as a contract: what crosses it, in what shape, how errors propagate, and what each side may assume. If a behaviour is not in the contract, it is undefined.</p>
+
+  <div class="contract">
+    <div class="ct-header"><span class="ct-num">B1</span><span class="ct-title">Browser ↔ Next.js</span><span class="ct-pair">HTTPS · streamed fetch</span></div>
+    <div class="ct-body"><div class="ct-grid">
+      <div class="ct-k">Transport</div><div class="ct-v">HTTPS for pages and route handlers. A <code>fetch()</code> streaming response (consumed via a <code>ReadableStream</code> reader) over HTTPS for the lesson stream.</div>
+      <div class="ct-k">Crosses</div><div class="ct-v">Rendered React pages; the typed stream events proxied from B2.</div>
+      <div class="ct-k">Auth</div><div class="ct-v">The access token is held client-side and sent on B2 calls. The login screen and token storage are Paideia-built — no external auth widget.</div>
+      <div class="ct-k">Errors</div><div class="ct-v">Page-level error boundaries. A failed stream surfaces as the stream <code>error</code> event, not an HTTP error.</div>
+      <div class="ct-k">Assumptions</div><div class="ct-v">Browser supports the <code>fetch()</code> streaming response body (<code>ReadableStream</code>) and sandboxed iframes — both covered by the FSD's supported-browser list.</div>
+    </div></div>
+  </div>
+
+  <div class="contract">
+    <div class="ct-header"><span class="ct-num">B2</span><span class="ct-title">Next.js ↔ Django API</span><span class="ct-pair">REST + stream · Bearer JWT</span></div>
+    <div class="ct-body"><div class="ct-grid">
+      <div class="ct-k">Transport</div><div class="ct-v">HTTPS. JSON for all endpoints except session generation, which is <code>text/event-stream</code>.</div>
+      <div class="ct-k">Crosses</div><div class="ct-v">The full API Contract — Section 7 — including the <code>/auth</code> endpoints that issue and refresh Django JWTs.</div>
+      <div class="ct-k">Auth</div><div class="ct-v"><code>Authorization: Bearer &lt;access_jwt&gt;</code> on every request except <code>/auth/login</code>. Missing/invalid/expired → <code>401</code>.</div>
+      <div class="ct-k">Errors</div><div class="ct-v">Consistent error envelope (Section 14.1). Frontend validates every response with zod; a contract mismatch throws in development.</div>
+      <div class="ct-k">Versioning</div><div class="ct-v"><code>/api/v1/</code> prefix. A breaking change is a new version prefix, never a silent shape change.</div>
+      <div class="ct-k">Assumptions</div><div class="ct-v">Django verifies the JWT signature locally (no external call). Next.js assumes any <code>2xx</code> body matches its zod schema.</div>
+    </div></div>
+  </div>
+
+  <div class="contract">
+    <div class="ct-header"><span class="ct-num">B3</span><span class="ct-title">Django ↔ Anthropic</span><span class="ct-pair">Anthropic SDK</span></div>
+    <div class="ct-body"><div class="ct-grid">
+      <div class="ct-k">Transport</div><div class="ct-v">HTTPS via <code>AsyncAnthropic</code>. Streaming for lessons; non-streaming for assessments.</div>
+      <div class="ct-k">Crosses</div><div class="ct-v"><b>Out:</b> system prompt + context. <b>In:</b> token stream (lesson) / completion (assessment).</div>
+      <div class="ct-k">Contract shape</div><div class="ct-v">Output shape is defined by the prompt and enforced by pydantic validation (Section 9.2). The model is told the exact tag and JSON structure to return.</div>
+      <div class="ct-k">Errors</div><div class="ct-v">API error, timeout, or unparseable output → <code>AgentError</code>/<code>AgentParseError</code> → session deleted, SSE <code>error</code> event. The full raw response is logged.</div>
+      <div class="ct-k">Assumptions</div><div class="ct-v">The agent app assumes nothing about model internals — only that the prompt contract produces parseable output most of the time, and that the failure path is safe when it does not.</div>
+    </div></div>
+  </div>
+
+  <div class="contract">
+    <div class="ct-header"><span class="ct-num">B4</span><span class="ct-title">Django ↔ PostgreSQL</span><span class="ct-pair">psycopg3 async</span></div>
+    <div class="ct-body"><div class="ct-grid">
+      <div class="ct-k">Transport</div><div class="ct-v">TCP over Railway private networking. <code>psycopg</code> v3, async-capable.</div>
+      <div class="ct-k">Crosses</div><div class="ct-v">All persistence. Sync ORM from sync views; async ORM (<code>aget</code>/<code>asave</code>) from the session view.</div>
+      <div class="ct-k">Contract shape</div><div class="ct-v">The schema in Section 5.1. Constraints (unique, FK, cascade) are enforced by the database, not only by application code.</div>
+      <div class="ct-k">Errors</div><div class="ct-v">A constraint violation surfaces as an integrity error → mapped to <code>409</code> or <code>422</code> by the error layer. A connection failure → <code>503</code>.</div>
+      <div class="ct-k">Assumptions</div><div class="ct-v">No code path issues a synchronous ORM call inside the async view. Migrations have run before the app version serves traffic (Section 5.2).</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="section" id="s14">
+  <div class="section-header"><span class="sec-num">14</span><h2 class="sec-title">Error Handling</h2></div>
+  <p class="lead">Errors are handled consistently across every boundary. A failure anywhere produces a predictable shape, is logged with enough context to diagnose, and degrades the user experience gracefully rather than breaking it.</p>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">14.1</span><span class="sub-title">The Error Envelope</span></div>
+    <p>Every non-streaming error response from the Django API uses one shape. Never a bare string, never raw HTML, never a stack trace. Implemented as a DRF custom exception handler in <code>common/</code>.</p>
+    <div class="codeblock">
+      <div class="cb-label">Standard Error Envelope — all non-2xx JSON responses</div>
+      <pre>
+{
+  <span class="c-str">"error"</span>: {
+    <span class="c-str">"code"</span>: <span class="c-str">"course_not_active"</span>,        <span class="c-comment">// stable machine-readable string</span>
+    <span class="c-str">"message"</span>: <span class="c-str">"This course is not active and cannot be enrolled into."</span>,
+    <span class="c-str">"detail"</span>: { <span class="c-str">"course_id"</span>: <span class="c-str">"uuid"</span> }   <span class="c-comment">// optional structured context</span>
+  }
+}</pre>
+    </div>
+    <table class="rtable">
+      <thead><tr><th>HTTP</th><th>Used for</th><th>Example <code>code</code></th></tr></thead>
+      <tbody>
+        <tr><td><code>400</code></td><td>Malformed request body</td><td><code>invalid_request</code></td></tr>
+        <tr><td><code>401</code></td><td>Missing / invalid / expired JWT</td><td><code>unauthenticated</code></td></tr>
+        <tr><td><code>403</code></td><td>Authenticated but not permitted to perform this action on a visible resource</td><td><code>forbidden_action</code></td></tr>
+        <tr><td><code>404</code></td><td>Resource absent or not in user's scope</td><td><code>not_found</code></td></tr>
+        <tr><td><code>409</code></td><td>State conflict</td><td><code>assessment_unavailable</code></td></tr>
+        <tr><td><code>422</code></td><td>Valid JSON, failed business validation</td><td><code>brief_incomplete</code></td></tr>
+        <tr><td><code>502</code></td><td>Upstream failure — Anthropic</td><td><code>agent_failure</code></td></tr>
+        <tr><td><code>503</code></td><td>Database unreachable</td><td><code>service_unavailable</code></td></tr>
+      </tbody>
+    </table>
+    <div class="callout cn"><strong>404 over 403 for Out-of-Scope Resources</strong>When a teacher requests a course belonging to another teacher, the API returns <code>404</code>, not <code>403</code> — the queryset scoping (Section 8.2) means the object is simply not in their visible set, and returning <code>404</code> avoids confirming the resource exists. <code>403</code> is reserved for an explicitly forbidden action on a resource the user <i>can</i> see. The FSD agrees: AC-13 and PROG-03 were updated to expect <code>404</code> for cross-course reads, so the two documents are consistent — a teacher probing another teacher's course endpoints receives <code>404</code> across the board.</div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">14.2</span><span class="sub-title">Streaming Errors</span></div>
+    <p>The SSE endpoint cannot use HTTP error codes once the <code>200</code> stream has opened. Errors after stream open are delivered as an SSE <code>error</code> event (Section 7.6). The client treats receipt of <code>error</code> — or a stream that closes without <code>done</code> — identically: show the error state, return to course home, do not increment session count.</p>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">14.3</span><span class="sub-title">Failure Matrix</span></div>
+    <table class="rtable">
+      <thead><tr><th>Failure</th><th>Detected by</th><th>System response</th><th>User sees</th></tr></thead>
+      <tbody>
+        <tr><td>Anthropic API down / errors</td><td>agent <code>client.py</code></td><td>Session deleted; failure logged with context</td><td>SSE <code>error</code> → course home; can retry</td></tr>
+        <tr><td>Anthropic timeout (&gt;30s)</td><td><code>asyncio.wait_for</code></td><td>Same as API failure</td><td>Same as above</td></tr>
+        <tr><td>Unparseable lesson output</td><td><code>parsers</code>/<code>validators</code></td><td>Session deleted; raw response logged</td><td>Same as above</td></tr>
+        <tr><td>One interactive block invalid</td><td><code>validators</code></td><td>Block replaced with text fallback; lesson delivered</td><td>Complete lesson, fallback in place of one visual</td></tr>
+        <tr><td>Assessment generation fails</td><td>assessment task</td><td>Session marked assessment-unavailable; lesson unaffected</td><td>Lesson normal; "assessment unavailable" state</td></tr>
+        <tr><td>DB write fails post-generation</td><td>ORM error</td><td>Session deleted; logged</td><td>SSE <code>error</code> → course home</td></tr>
+        <tr><td>Invalid login credentials</td><td><code>accounts</code> /auth/login</td><td>No token issued; generic 401 (does not reveal whether email exists)</td><td>User sees "email or password incorrect"</td></tr>
+        <tr><td>Client disconnects mid-stream</td><td>async generator</td><td>Generation completes; lesson stored for resume</td><td>On return: lesson resumed, not regenerated</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="s15">
+  <div class="section-header"><span class="sec-num">15</span><h2 class="sec-title">Security Architecture</h2></div>
+  <p class="lead">Security is layered across every boundary. No single control is load-bearing alone. The model assumes any one layer can fail and the next still holds.</p>
+  <table class="rtable">
+    <thead><tr><th>Layer</th><th>Control</th><th>Protects against</th></tr></thead>
+    <tbody>
+      <tr><td>Transport</td><td>HTTPS/TLS 1.2+ on all boundaries; HTTP redirected</td><td>Interception, tampering in transit</td></tr>
+      <tr><td>Identity</td><td>Django-issued short-lived JWTs (simplejwt); signature verified server-side every request</td><td>Forged or stale identity</td></tr>
+      <tr><td>Authorization</td><td>DRF permission classes + queryset scoping (Section 8)</td><td>Privilege escalation, cross-school and cross-course access</td></tr>
+      <tr><td>Input</td><td>DRF serializer validation; pydantic for agent output</td><td>Malformed input, injection via request body</td></tr>
+      <tr><td>CORS</td><td><code>CORS_ALLOWED_ORIGINS</code> = the Next.js URL only, exact match</td><td>Calls from unauthorized origins</td></tr>
+      <tr><td>Generated content</td><td>Server-side HTML validation before storage (Section 9.2)</td><td>Malformed / oversized / disallowed interactive blocks</td></tr>
+      <tr><td>Generated content</td><td>iframe <code>sandbox="allow-scripts"</code>, no <code>allow-same-origin</code></td><td>Generated JS reaching the parent page or other students' data</td></tr>
+      <tr><td>Generated content</td><td>iframe CSP — script-src limited to CDN whitelist</td><td>Generated code loading arbitrary external scripts</td></tr>
+      <tr><td>Secrets</td><td>All secrets in Railway env vars; never in source or logs</td><td>Credential leakage</td></tr>
+      <tr><td>Data isolation</td><td>Every model school-scoped; <code>IsSameSchool</code> universal</td><td>One school ever seeing another's data</td></tr>
+      <tr><td>Database</td><td>Private Railway networking; no public DB endpoint</td><td>Direct external database access</td></tr>
+      <tr><td>Audit</td><td>All AI calls and auth events logged (Section 17)</td><td>Undetected misuse; inability to investigate</td></tr>
+    </tbody>
+  </table>
+  <div class="callout cp"><strong>Minors &amp; Generated Content</strong>The system serves children and delivers AI-generated content to them. The MVP's defence is the sandbox plus server-side validation — content cannot harm the application or leak data. Content <i>appropriateness</i> (a dedicated moderation layer) is explicitly post-MVP per the FSD. This is a known, accepted MVP limitation: the pilot runs with a small, supervised cohort, and teacher diagnostic review (PROG-03) is the human check until the moderation layer ships.</div>
+</div>
+
+<div class="section" id="s16">
+  <div class="section-header"><span class="sec-num">16</span><h2 class="sec-title">Deployment</h2></div>
+  <p class="lead">Three Railway services from one GitHub repository. Deployment is push-to-deploy on the main branch, gated by CI.</p>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">16.1</span><span class="sub-title">Services</span></div>
+    <table class="rtable">
+      <thead><tr><th>Service</th><th>Root</th><th>Build</th><th>Run</th></tr></thead>
+      <tbody>
+        <tr><td>Frontend</td><td><code>frontend/</code></td><td><code>next build</code></td><td><code>next start</code></td></tr>
+        <tr><td>API</td><td><code>backend/</code></td><td><code>pip install -r requirements.txt</code></td><td><code>gunicorn paideia.asgi:application -k uvicorn.workers.UvicornWorker</code></td></tr>
+        <tr><td>Database</td><td>—</td><td>Railway managed PostgreSQL 16</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <div class="callout cc"><strong>The Run Command Is Non-Negotiable</strong>The API run command must use the Uvicorn worker class. With the default sync worker the async session view silently runs synchronously, holding a worker for the full 30s generation and collapsing under concurrency. The pre-deploy command for the API service is <code>python manage.py migrate --noinput</code> (Section 5.2).</div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">16.2</span><span class="sub-title">Environments &amp; CI</span></div>
+    <p>Two Railway environments: <b>staging</b> and <b>production</b>, each with its own three services, its own database, and its own Anthropic API key. Production's <code>ANTHROPIC_MODEL_VERSION</code> is set independently of staging's, allowing a model to be validated on staging before promotion.</p>
+    <p>CI runs on every pull request: backend lint + unit tests + <code>makemigrations --check</code>; frontend lint + type-check + build. A merge to <code>main</code> deploys to staging automatically; promotion to production is a manual action after staging verification.</p>
+  </div>
+</div>
+
+<div class="section" id="s17">
+  <div class="section-header"><span class="sec-num">17</span><h2 class="sec-title">Observability</h2></div>
+  <p class="lead">For an AI-driven product, logs are the primary tool for understanding content quality, not just uptime. The logging strategy is built around being able to answer "why did this student get this lesson."</p>
+  <table class="rtable">
+    <thead><tr><th>Signal</th><th>Captured</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>AI call log</td><td>Per call: timestamp, session_id, enrollment_id, model version, prompt version, prompt + completion token counts, latency, outcome</td><td>Cost tracking; the primary content-quality diagnostic (FSD NFR Logging)</td></tr>
+      <tr><td>Lesson diagnostics</td><td>Stored on the lesson row: <code>prompt_context</code>, <code>agent_plan</code>, <code>raw_response</code></td><td>Exactly reproduce any lesson's generation (FSD AC-11)</td></tr>
+      <tr><td>Auth events</td><td>Sign-in, account create, deactivate, reassign — actor, target, timestamp</td><td>Security audit trail</td></tr>
+      <tr><td>Error log</td><td>Every error envelope emission + every SSE <code>error</code>, with full context</td><td>Failure investigation</td></tr>
+      <tr><td>Request log</td><td>Method, path, status, latency, user role</td><td>Performance baseline; anomaly detection</td></tr>
+    </tbody>
+  </table>
+  <p>Logs are structured JSON, retained 90 days (FSD), and viewed through the Railway dashboard for MVP. No external observability platform is introduced in this phase.</p>
+  <div class="callout cn"><strong>The "Why This Lesson" Query</strong>When a teacher reports a poor lesson, an engineer takes the <code>session_id</code>, pulls the lesson row's <code>prompt_context</code> (the exact course brief state and summarised history at generation time), <code>agent_plan</code> (the model's reasoning), and <code>raw_response</code>. Together these reconstruct the generation completely — no guesswork. This is why those three fields are stored on every lesson, even though they are never shown to a user.</div>
+</div>
+
+<div class="section" id="s18">
+  <div class="section-header"><span class="sec-num">18</span><h2 class="sec-title">Key Sequence Flows</h2></div>
+  <p class="lead">Three end-to-end flows traced across every component and boundary they touch. These verify that the components specified above interface correctly to deliver the FSD's core requirements.</p>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">18.1</span><span class="sub-title">Flow A — Student Takes a Lesson</span></div>
+    <div class="diagram">
+      <div class="dg-label">Flow A — Session start to completion</div>
+      <div class="dg-step"><span class="dg-step-num">1</span><span class="dg-step-text">Student clicks "Continue" on a course. Next.js issues a streaming <code>fetch()</code> POST to <code>/enrollments/{id}/sessions</code> and reads the response body via a <code>ReadableStream</code> reader (B1→B2).</span></div>
+      <div class="dg-step"><span class="dg-step-num">2</span><span class="dg-step-text">Django async view verifies the access token locally (simplejwt — no external call), confirms enrollment ownership, hands to <code>SessionOrchestrator</code>.</span></div>
+      <div class="dg-step"><span class="dg-step-num">3</span><span class="dg-step-text">Orchestrator finds no open session → creates <code>Session(status=generating)</code> (B4). <code>ContextAssembler</code> reads brief + summarised history (B4).</span></div>
+      <div class="dg-step"><span class="dg-step-num">4</span><span class="dg-step-text">Orchestrator dispatches the concurrent assessment task, then calls <code>agent.stream_lesson(context)</code> (B3).</span></div>
+      <div class="dg-step"><span class="dg-step-num">5</span><span class="dg-step-text">Anthropic tokens flow agent → orchestrator → SSE <code>token</code> events → browser. The Rendering Engine shows markdown building live.</span></div>
+      <div class="dg-step"><span class="dg-step-num">6</span><span class="dg-step-text">Stream ends. Agent parses + validates → <code>Lesson</code> object. Orchestrator persists the lesson (B4), sets <code>status=active</code>, emits <code>lesson_complete</code>.</span></div>
+      <div class="dg-step"><span class="dg-step-num">7</span><span class="dg-step-text">Frontend fetches <code>GET /sessions/{id}/lesson</code>, swaps the streamed view for the structured block render — interactive iframes now appear.</span></div>
+      <div class="dg-step"><span class="dg-step-num">8</span><span class="dg-step-text">Assessment task has finished; <code>assessment_ready</code> + <code>done</code> emitted. Student reads, clicks "Start Assessment".</span></div>
+      <div class="dg-step"><span class="dg-step-num">9</span><span class="dg-step-text">AssessmentEngine fetches questions, posts each answer to <code>POST /sessions/{id}/responses</code>, reveals correctness per question.</span></div>
+      <div class="dg-step"><span class="dg-step-num">10</span><span class="dg-step-text">Final answer posted → orchestrator writes the immutable <code>session_history</code> row, sets <code>status=complete</code>, updates <code>enrollment.last_session_at</code> (B4). Summary shown.</span></div>
+    </div>
+    <p style="margin-top:10px;font-size:13px;color:var(--ink-3);">Touches all four boundaries. Realises FSD SESS-01 through SESS-06, AGENT-01 through AGENT-09, ASMT-*, REND-*.</p>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">18.2</span><span class="sub-title">Flow B — Teacher Creates &amp; Populates a Course</span></div>
+    <div class="diagram">
+      <div class="dg-label">Flow B — Draft to active class</div>
+      <div class="dg-step"><span class="dg-step-num">1</span><span class="dg-step-text">Teacher logs in via <code>POST /auth/login</code> (B2), receives tokens. Next.js calls <code>GET /me</code> → role <code>teacher</code> → routes into <code>teacher/*</code>.</span></div>
+      <div class="dg-step"><span class="dg-step-num">2</span><span class="dg-step-text">Teacher fills the brief form. <code>POST /api/v1/courses</code> creates a <code>draft</code> course with <code>teacher_id</code> = self (B2→B4).</span></div>
+      <div class="dg-step"><span class="dg-step-num">3</span><span class="dg-step-text">Teacher clicks Activate. <code>POST /courses/{id}/activate</code> validates required fields; on pass → <code>status=active</code>.</span></div>
+      <div class="dg-step"><span class="dg-step-num">4</span><span class="dg-step-text">Teacher opens enrollment, selects students. <code>POST /courses/{id}/enrollments</code> — <code>IsCourseOwnerOrAdmin</code> confirms ownership, creates/reactivates enrollment rows (B4).</span></div>
+      <div class="dg-step"><span class="dg-step-num">5</span><span class="dg-step-text">Students appear on their home screen on next <code>GET /students/me/courses</code>. The course is now live.</span></div>
+    </div>
+    <p style="margin-top:10px;font-size:13px;color:var(--ink-3);">Realises FSD BRIEF-01/05/07, ENROL-01/05 — and the approved change putting enrollment in the teacher's hands.</p>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">18.3</span><span class="sub-title">Flow C — Teacher Leaves Mid-Term</span></div>
+    <div class="diagram">
+      <div class="dg-label">Flow C — Deactivation without disruption</div>
+      <div class="dg-step"><span class="dg-step-num">1</span><span class="dg-step-text">Admin calls <code>PATCH /admin/users/{id}/deactivate</code> on the departing teacher.</span></div>
+      <div class="dg-step"><span class="dg-step-num">2</span><span class="dg-step-text">Django sets the user's <code>is_active=false</code> (B4); the account can no longer log in or refresh. Courses are <b>not</b> touched.</span></div>
+      <div class="dg-step"><span class="dg-step-num">3</span><span class="dg-step-text">Response returns <code>affected_courses</code> with enrolled counts. Admin UI prompts for reassignment.</span></div>
+      <div class="dg-step"><span class="dg-step-num">4</span><span class="dg-step-text">Meanwhile a student in one of those courses starts a session — it works. <code>teacher_id</code> being <code>NULL</code> does not block generation; the course brief and history are intact.</span></div>
+      <div class="dg-step"><span class="dg-step-num">5</span><span class="dg-step-text">Admin calls <code>POST /admin/courses/{id}/reassign</code> with a new teacher. <code>teacher_id</code> updates; the new teacher immediately has progress + enrollment access.</span></div>
+    </div>
+    <p style="margin-top:10px;font-size:13px;color:var(--ink-3);">Realises FSD ACC-05/06, AC-14 — and proves the nullable <code>teacher_id</code> decision (Section 5.1) holds end to end.</p>
+  </div>
+</div>
+
+<div class="section" id="s19">
+  <div class="section-header"><span class="sec-num">19</span><h2 class="sec-title">Implementation Sequence</h2></div>
+  <p class="lead">A build order that keeps the system integrable at every step. Each phase ends with something demonstrable. The core loop is proven as early as possible — because if it fails, everything after it is wasted effort.</p>
+  <div class="phase-list">
+    <div class="phase">
+      <div class="phase-num">01</div>
+      <div class="phase-body">
+        <div class="phase-title">Foundation</div>
+        <div class="phase-desc">Monorepo, both Railway services, PostgreSQL, CI. Django ASGI skeleton with the Uvicorn run command verified. The accounts app with the User model, <code>/auth/login</code> + <code>/auth/refresh</code>, and simplejwt. Next.js shell with the login screen and token storage. The <code>/me</code> endpoint and end-to-end authenticated routing working.</div>
+        <div class="phase-deliv">Demo: a user signs in and is routed to a role-correct empty dashboard.</div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">02</div>
+      <div class="phase-body">
+        <div class="phase-title">Accounts &amp; Courses</div>
+        <div class="phase-desc">Full data layer with migrations and indices. <code>accounts</code> and <code>courses</code> apps — account management, course brief CRUD, the four permission classes, enrollment endpoints with teacher ownership scoping.</div>
+        <div class="phase-deliv">Demo: admin creates users; teacher creates a course and enrolls students (Flow B).</div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">03</div>
+      <div class="phase-body">
+        <div class="phase-title">The AI Agent — Isolated</div>
+        <div class="phase-desc">The <code>agent</code> app, built and tested with no database and no HTTP. Prompts, parsers, pydantic schemas, HTML validation. Exercised against fixture context dicts until lesson and assessment output parse reliably.</div>
+        <div class="phase-deliv">Demo: a fixture context produces a validated <code>Lesson</code> object in a test run.</div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">04</div>
+      <div class="phase-body">
+        <div class="phase-title">The Core Loop</div>
+        <div class="phase-desc">Context assembly with summarisation, the session orchestrator and state machine, the async SSE view, concurrent assessment dispatch. The session history write. This phase proves the MVP's central hypothesis.</div>
+        <div class="phase-deliv">Demo: a student streams a generated lesson and a second session adapts from the first (Flow A).</div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">05</div>
+      <div class="phase-body">
+        <div class="phase-title">The Rendering Engine</div>
+        <div class="phase-desc">Block router and the three renderers. Progressive streaming render, the sandboxed interactive iframe with its fallback, the assessment state machine. Lesson now looks and feels complete.</div>
+        <div class="phase-deliv">Demo: a lesson with an interactive visual renders; the assessment runs to a summary.</div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">06</div>
+      <div class="phase-body">
+        <div class="phase-title">Progress, Resilience &amp; Hardening</div>
+        <div class="phase-desc">Progress views for teacher and student. Session resume, abandoned-session cleanup cron, the full failure matrix. Observability logging. Every acceptance criterion AC-01 to AC-14 verified.</div>
+        <div class="phase-deliv">Demo: all FSD acceptance criteria pass; the system is pilot-ready.</div>
+      </div>
+    </div>
+  </div>
+  <div class="callout cp"><strong>Why the Agent Is Built Before the Loop</strong>Phase 3 builds the AI agent in isolation, before it is wired into sessions. This is deliberate. The agent's output quality is the single biggest unknown in the project. Proving it against fixtures — with no database, no streaming, no UI in the way — surfaces prompt and parsing problems while they are cheap to fix. By Phase 4 the agent is a known quantity and the loop is just plumbing around it.</div>
+</div>
+
+</div><!-- /content -->
+<div class="future-section">
+  <div class="fs-row">
+    <div class="fs-text">PAIDEIA · PAI-TSD-001 · v1.0 Draft · Technical Specification</div>
+    <div class="fs-text">Pairs with PAI-FSD-001 v2.0 · Internal — Confidential</div>
+  </div>
+</div>
+</div><!-- /main -->
+<script>
+const sections = document.querySelectorAll('[id^="s"]');
+const navLinks = document.querySelectorAll('.nav-item, .nav-sub');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(n => {
+        n.classList.remove('active');
+        if (n.getAttribute('href') === '#' + e.target.id) n.classList.add('active');
+      });
+    }
+  });
+}, { rootMargin: '-12% 0px -80% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

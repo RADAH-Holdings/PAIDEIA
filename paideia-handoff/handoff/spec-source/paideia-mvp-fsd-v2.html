@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paideia — MVP Functional Specification v2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f8f8f6;
+  --surface: #ffffff;
+  --ink: #0f0f0e;
+  --ink-2: #3a3a38;
+  --ink-3: #6e6e6a;
+  --ink-4: #a0a09c;
+  --rule: #e4e4e0;
+  --accent: #1a3a8f;
+  --accent-light: #e8edf8;
+  --accent-mid: #3b5fc0;
+  --green: #1a6b3a;
+  --green-bg: #e8f4ed;
+  --amber: #7a4f10;
+  --amber-bg: #fdf3e3;
+  --red: #8b1a1a;
+  --red-bg: #fbeaea;
+  --purple: #4a1a8f;
+  --purple-bg: #f0eafa;
+  --teal: #0e6b5e;
+  --teal-bg: #e4f4f1;
+  --sidebar-w: 290px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;font-size:14px;}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.7;display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--ink);color:rgba(255,255,255,0.75);height:100vh;position:sticky;top:0;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent;}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px;}
+.sb-header{padding:24px 22px 18px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.sb-product{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;letter-spacing:0.05em;margin-bottom:3px;}
+.sb-doctype{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:0.15em;text-transform:uppercase;}
+.sb-meta{padding:14px 22px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.sb-meta-row{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;padding:3px 0;}
+.sb-meta-row .l{color:rgba(255,255,255,0.28);}.sb-meta-row .v{color:rgba(255,255,255,0.65);}
+.pill{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.08em;}
+.pill-draft{background:rgba(122,79,16,0.4);color:#f5c87a;}
+.pill-v2{background:rgba(59,95,192,0.35);color:#7eb8f7;}
+.sb-nav{padding:16px 0;flex:1;}
+.nav-group-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.18);padding:12px 22px 5px;}
+.nav-item{display:flex;align-items:baseline;gap:10px;padding:5px 22px;font-size:12px;color:rgba(255,255,255,0.5);text-decoration:none;transition:all 0.15s;cursor:pointer;line-height:1.4;}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,0.04);}
+.nav-item.active{color:#fff;background:rgba(59,95,192,0.25);border-right:2px solid #3b5fc0;}
+.nav-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,0.18);min-width:26px;}
+.nav-item:hover .nav-num,.nav-item.active .nav-num{color:#3b5fc0;}
+.nav-sub{padding:3px 22px 3px 58px;font-size:11px;color:rgba(255,255,255,0.3);text-decoration:none;display:block;transition:color 0.15s;cursor:pointer;line-height:1.5;}
+.nav-sub:hover{color:rgba(255,255,255,0.65);}
+.nav-sub.active{color:#7eb8f7;}
+
+/* MAIN */
+.main{flex:1;min-width:0;}
+
+/* DOC HEADER */
+.doc-header{background:var(--surface);border-bottom:2px solid var(--ink);padding:44px 60px 36px;}
+.dh-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--ink-3);text-transform:uppercase;margin-bottom:14px;}
+.dh-title{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;letter-spacing:-0.02em;line-height:1.1;margin-bottom:6px;}
+.dh-sub{font-size:15px;color:var(--ink-2);font-weight:300;font-style:italic;margin-bottom:28px;}
+.dh-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);}
+.dh-cell{background:var(--bg);padding:10px 14px;}
+.dh-cell .ml{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.18em;color:var(--ink-4);text-transform:uppercase;margin-bottom:3px;}
+.dh-cell .mv{font-size:12px;font-weight:500;color:var(--ink);}
+
+/* CONTENT */
+.content{padding:0 60px 80px;}
+.section{padding-top:60px;border-bottom:1px solid var(--rule);padding-bottom:44px;}
+.section:last-child{border-bottom:none;}
+.section-header{display:flex;align-items:baseline;gap:14px;margin-bottom:24px;}
+.sec-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent-mid);min-width:32px;}
+.sec-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.01em;}
+.subsection{margin-top:32px;}
+.sub-header{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--rule);}
+.sub-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-4);}
+.sub-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--ink-2);}
+
+/* TYPOGRAPHY */
+p{color:var(--ink-2);font-size:14px;line-height:1.8;max-width:760px;}
+p+p{margin-top:10px;}
+.lead{font-size:15px;color:var(--ink);font-weight:400;line-height:1.75;max-width:720px;margin-bottom:20px;}
+
+/* AIM BOX */
+.aim-box{background:var(--ink);color:#fff;padding:32px 36px;margin:28px 0;max-width:800px;position:relative;overflow:hidden;}
+.aim-box::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent-mid);}
+.aim-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.25em;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:12px;}
+.aim-stmt{font-family:'Syne',sans-serif;font-size:17px;font-weight:500;line-height:1.55;color:#fff;}
+
+/* CALLOUTS */
+.callout{padding:14px 18px;margin:18px 0;max-width:760px;border-left:3px solid;font-size:13.5px;line-height:1.7;}
+.callout strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;display:block;margin-bottom:4px;}
+.cn{background:var(--accent-light);border-color:var(--accent-mid);color:var(--accent);}
+.cw{background:var(--amber-bg);border-color:#c87920;color:var(--amber);}
+.cc{background:var(--red-bg);border-color:#c03030;color:var(--red);}
+.cs{background:var(--green-bg);border-color:#1a8f4a;color:var(--green);}
+.cp{background:var(--purple-bg);border-color:#7a3ac0;color:var(--purple);}
+.ct{background:var(--teal-bg);border-color:#0e8f7a;color:var(--teal);}
+
+/* TABLES */
+.rtable{width:100%;border-collapse:collapse;font-size:13px;margin-top:18px;}
+.rtable thead tr{background:var(--ink);}
+.rtable th{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.55);padding:9px 13px;text-align:left;font-weight:400;}
+.rtable td{padding:11px 13px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.6;color:var(--ink-2);}
+.rtable tr:nth-child(even) td{background:var(--bg);}
+.rtable tr:last-child td{border-bottom:none;}
+.req-id{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent-mid);white-space:nowrap;font-weight:500;}
+.pri{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 6px;border-radius:2px;white-space:nowrap;}
+.pm{background:var(--red-bg);color:var(--red);}
+.ps{background:var(--amber-bg);color:var(--amber);}
+.pc{background:var(--green-bg);color:var(--green);}
+
+/* CODE BLOCKS */
+.codeblock{background:#0f1117;border-radius:2px;padding:24px 28px;margin-top:18px;overflow-x:auto;max-width:820px;}
+.codeblock pre{font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.8;color:#e4e4e0;white-space:pre;}
+.cb-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.15em;color:rgba(255,255,255,0.25);text-transform:uppercase;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.c-entity{color:#7eb8f7;font-weight:500;}
+.c-type{color:#a8e6a0;}
+.c-comment{color:#4e5560;font-style:italic;}
+.c-pk{color:#e89cf5;}
+.c-constraint{color:#f7c77e;}
+.c-var{color:#7eb8f7;}
+.c-inst{color:#f7c77e;}
+.c-str{color:#a8e6a0;}
+.c-kw{color:#e89cf5;}
+
+/* SCOPE GRID */
+.scope-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);margin-top:18px;max-width:820px;}
+.scope-col{background:var(--surface);padding:22px;}
+.scope-col h4{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;padding-bottom:7px;border-bottom:2px solid;}
+.scope-in h4{color:var(--green);border-color:var(--green);}
+.scope-out h4{color:var(--red);border-color:var(--red);}
+.scope-item{display:flex;gap:9px;padding:5px 0;font-size:13px;color:var(--ink-2);border-bottom:1px solid var(--rule);line-height:1.5;}
+.scope-item:last-child{border-bottom:none;}
+.scope-item::before{font-family:'IBM Plex Mono',monospace;font-size:12px;flex-shrink:0;margin-top:1px;}
+.scope-in .scope-item::before{content:'✓';color:var(--green);}
+.scope-out .scope-item::before{content:'✕';color:var(--red);}
+
+/* MODULE MAP */
+.module-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--rule);margin-top:22px;}
+.module-card{background:var(--surface);padding:24px 22px;border-top:3px solid transparent;}
+.module-card.mc-auth{border-top-color:#3b5fc0;}
+.module-card.mc-brief{border-top-color:#c87920;}
+.module-card.mc-session{border-top-color:#1a8f4a;}
+.module-card.mc-ai{border-top-color:#7a3ac0;}
+.module-card.mc-render{border-top-color:#0e8f7a;}
+.module-card.mc-assess{border-top-color:#8f1a3a;}
+.module-card.mc-history{border-top-color:#3a6b1a;}
+.module-card.mc-progress{border-top-color:#1a5a8f;}
+.mc-id{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--ink-4);text-transform:uppercase;margin-bottom:8px;}
+.mc-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:8px;color:var(--ink);}
+.mc-desc{font-size:12.5px;color:var(--ink-3);line-height:1.6;}
+.mc-deps{margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-4);}
+.mc-deps span{color:var(--accent-mid);}
+
+/* STACK DECISION */
+.stack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--rule);margin-top:22px;}
+.stack-card{background:var(--surface);padding:26px 24px;}
+.stack-tech{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px;}
+.stack-role{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent-mid);letter-spacing:0.1em;margin-bottom:14px;}
+.stack-why{font-size:13px;color:var(--ink-2);line-height:1.7;margin-bottom:12px;}
+.stack-workaround{padding:10px 14px;background:var(--amber-bg);border-left:2px solid #c87920;font-size:12.5px;color:var(--amber);line-height:1.65;margin-top:10px;}
+.stack-workaround strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;display:block;margin-bottom:3px;}
+
+/* ARCH FLOW */
+.arch-flow{background:var(--surface);border:1px solid var(--rule);padding:32px 36px;margin-top:20px;max-width:820px;font-family:'IBM Plex Mono',monospace;font-size:12px;overflow-x:auto;}
+.af-label{font-size:9px;letter-spacing:0.2em;color:var(--ink-4);text-transform:uppercase;margin-bottom:20px;}
+.af-row{display:flex;align-items:center;gap:0;margin-bottom:3px;flex-wrap:nowrap;}
+.af-box{padding:8px 13px;font-size:11.5px;white-space:nowrap;font-weight:500;border:1px solid;}
+.af-next{background:var(--accent-light);border-color:var(--accent-mid);color:var(--accent);}
+.af-sys{background:var(--ink);border-color:var(--ink);color:#fff;}
+.af-store{background:var(--green-bg);border-color:var(--green);color:var(--green);}
+.af-agent{background:#1a1a3a;border-color:#3b5fc0;color:#7eb8f7;}
+.af-render{background:var(--teal-bg);border-color:var(--teal);color:var(--teal);}
+.af-arr{color:var(--ink-4);padding:0 7px;font-size:14px;flex-shrink:0;}
+.af-note{font-size:10px;color:var(--ink-4);margin-left:8px;letter-spacing:0.07em;}
+.af-indent{margin-left:20px;color:var(--ink-4);font-size:10px;padding:2px 0;}
+
+/* FIELD SPEC */
+.field-spec{margin-top:14px;max-width:820px;}
+.field-row{display:grid;grid-template-columns:180px 110px 1fr;gap:1px;background:var(--rule);margin-bottom:1px;}
+.field-row.fh{background:var(--ink);}
+.field-cell{background:var(--surface);padding:9px 13px;font-size:12.5px;color:var(--ink-2);line-height:1.5;}
+.fh .field-cell{background:var(--ink);color:rgba(255,255,255,0.45);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;}
+.fn{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent-mid);font-weight:500;}
+.ft{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--green);}
+
+/* PROMPT SPEC */
+.prompt-spec{background:#0f1117;border:1px solid rgba(59,95,192,0.3);padding:26px 30px;margin-top:18px;max-width:820px;}
+.ps-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.15em;color:#3b5fc0;text-transform:uppercase;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(59,95,192,0.2);}
+.prompt-spec pre{font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.75;color:#c8c8c4;white-space:pre-wrap;}
+
+/* RENDERER BLOCKS */
+.renderer-stack{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:var(--rule);margin-top:22px;}
+.renderer-card{background:var(--surface);padding:26px 22px;}
+.rc-num{font-family:'IBM Plex Mono',monospace;font-size:32px;font-weight:300;color:rgba(0,0,0,0.06);line-height:1;margin-bottom:10px;}
+.rc-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:6px;}
+.rc-subtitle{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent-mid);letter-spacing:0.1em;margin-bottom:12px;}
+.rc-desc{font-size:13px;color:var(--ink-3);line-height:1.65;}
+
+/* LIB TABLE */
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--rule);margin-top:18px;max-width:820px;}
+.lib-card{background:var(--surface);padding:16px 18px;}
+.lib-name{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;color:var(--ink);margin-bottom:4px;}
+.lib-use{font-size:12px;color:var(--ink-3);line-height:1.5;}
+.lib-subject{font-size:11px;color:var(--accent-mid);font-style:italic;margin-top:4px;}
+
+/* AC LIST */
+.ac-list{list-style:none;margin-top:14px;max-width:760px;}
+.ac-list li{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:13.5px;color:var(--ink-2);line-height:1.6;}
+.ac-list li:last-child{border-bottom:none;}
+.ac-id{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);min-width:52px;padding-top:2px;}
+
+/* FUTURE SECTION */
+.future-section{background:var(--ink);padding:60px;}
+.fs-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.2em;color:rgba(255,255,255,0.25);text-transform:uppercase;margin-bottom:16px;}
+.future-section h2{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:#fff;margin-bottom:10px;}
+.fs-sub{font-size:13.5px;color:rgba(255,255,255,0.45);max-width:600px;margin-bottom:36px;line-height:1.7;}
+.future-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:rgba(255,255,255,0.04);}
+.future-card{background:rgba(255,255,255,0.015);padding:24px;border-left:2px solid rgba(255,255,255,0.03);transition:background 0.2s;}
+.future-card:hover{background:rgba(59,95,192,0.08);border-left-color:rgba(59,95,192,0.5);}
+.fc-cat{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.2em;color:rgba(59,95,192,0.85);text-transform:uppercase;margin-bottom:8px;}
+.future-card h4{font-family:'Syne',sans-serif;font-size:13.5px;font-weight:600;color:rgba(255,255,255,0.82);margin-bottom:6px;line-height:1.3;}
+.future-card p{font-size:12px;color:rgba(255,255,255,0.38);line-height:1.65;max-width:none;}
+
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .doc-header,.content,.future-section{padding-left:24px;padding-right:24px;}
+  .scope-grid{grid-template-columns:1fr;}
+  .field-row{grid-template-columns:1fr 1fr;}
+  .field-row .field-cell:last-child{grid-column:1/-1;}
+}
+</style>
+</head>
+<body>
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-header">
+    <div class="sb-product">PAIDEIA</div>
+    <div class="sb-doctype">Functional Spec · MVP · v2.0</div>
+  </div>
+  <div class="sb-meta">
+    <div class="sb-meta-row"><span class="l">Doc ID</span><span class="v">PAI-FSD-001</span></div>
+    <div class="sb-meta-row"><span class="l">Version</span><span class="pill pill-v2">v2.0</span></div>
+    <div class="sb-meta-row"><span class="l">Status</span><span class="pill pill-draft">DRAFT</span></div>
+    <div class="sb-meta-row"><span class="l">Scope</span><span class="v">MVP Only</span></div>
+  </div>
+  <div class="sb-nav">
+    <div class="nav-group-label">Foundation</div>
+    <a class="nav-item" href="#s1"><span class="nav-num">01</span>Purpose &amp; MVP Aim</a>
+    <a class="nav-item" href="#s2"><span class="nav-num">02</span>Scope</a>
+    <a class="nav-item" href="#s3"><span class="nav-num">03</span>System Actors</a>
+    <a class="nav-item" href="#s4"><span class="nav-num">04</span>System Modules</a>
+    <div class="nav-group-label">Tech Stack</div>
+    <a class="nav-item" href="#s5"><span class="nav-num">05</span>Stack Decisions</a>
+    <a class="nav-sub" href="#s5-1">5.1 Evaluation Criteria</a>
+    <a class="nav-sub" href="#s5-2">5.2 Chosen Stack</a>
+    <a class="nav-sub" href="#s5-3">5.3 Workarounds</a>
+    <a class="nav-sub" href="#s5-4">5.4 Deployment</a>
+    <div class="nav-group-label">Functional Modules</div>
+    <a class="nav-item" href="#s6"><span class="nav-num">06</span>Auth &amp; Identity</a>
+    <a class="nav-item" href="#s7"><span class="nav-num">07</span>Account Management</a>
+    <a class="nav-item" href="#s8"><span class="nav-num">08</span>Course Brief</a>
+    <a class="nav-item" href="#s9"><span class="nav-num">09</span>Enrollment</a>
+    <a class="nav-item" href="#s10"><span class="nav-num">10</span>Session Orchestration</a>
+    <a class="nav-item" href="#s11"><span class="nav-num">11</span>Context Assembly</a>
+    <a class="nav-item" href="#s12"><span class="nav-num">12</span>AI Agent Module</a>
+    <a class="nav-sub" href="#s12-1">12.1 Lesson Generation</a>
+    <a class="nav-sub" href="#s12-2">12.2 Assessment Generation</a>
+    <a class="nav-sub" href="#s12-3">12.3 Streaming</a>
+    <a class="nav-item" href="#s13"><span class="nav-num">13</span>Rendering Engine</a>
+    <a class="nav-sub" href="#s13-1">13.1 Architecture</a>
+    <a class="nav-sub" href="#s13-2">13.2 Block Schema</a>
+    <a class="nav-sub" href="#s13-3">13.3 Renderer 1 — Text</a>
+    <a class="nav-sub" href="#s13-4">13.4 Renderer 2 — Interactive</a>
+    <a class="nav-sub" href="#s13-5">13.5 Renderer 3 — Assessment</a>
+    <a class="nav-sub" href="#s13-6">13.6 Security</a>
+    <a class="nav-sub" href="#s13-7">13.7 Library Whitelist</a>
+    <a class="nav-item" href="#s14"><span class="nav-num">14</span>Assessment Engine</a>
+    <a class="nav-item" href="#s15"><span class="nav-num">15</span>Session History</a>
+    <a class="nav-item" href="#s16"><span class="nav-num">16</span>Progress View</a>
+    <div class="nav-group-label">Technical</div>
+    <a class="nav-item" href="#s17"><span class="nav-num">17</span>Data Models</a>
+    <a class="nav-item" href="#s18"><span class="nav-num">18</span>Non-Functional Req.</a>
+    <a class="nav-item" href="#s19"><span class="nav-num">19</span>Acceptance Criteria</a>
+    <div class="nav-group-label">Roadmap</div>
+    <a class="nav-item" href="#s20"><span class="nav-num">20</span>Full System Roadmap</a>
+  </div>
+</nav>
+<!-- MAIN -->
+<div class="main">
+<div class="doc-header">
+  <div class="dh-eyebrow">Paideia · MVP · Functional Specification Document · v2.0</div>
+  <div class="dh-title">Core Loop Specification</div>
+  <div class="dh-sub">Includes: System Modules · Tech Stack Decisions · Rendering Engine · Workarounds</div>
+  <div class="dh-meta">
+    <div class="dh-cell"><div class="ml">Document ID</div><div class="mv">PAI-FSD-001</div></div>
+    <div class="dh-cell"><div class="ml">Version</div><div class="mv">2.0 — Draft</div></div>
+    <div class="dh-cell"><div class="ml">Supersedes</div><div class="mv">PAI-FSD-001 v1.0</div></div>
+    <div class="dh-cell"><div class="ml">New in v2.0</div><div class="mv">Stack · Modules · Rendering Engine</div></div>
+    <div class="dh-cell"><div class="ml">Deployment</div><div class="mv">Railway (full stack)</div></div>
+    <div class="dh-cell"><div class="ml">Classification</div><div class="mv">Internal — Confidential</div></div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- S1: PURPOSE -->
+<div class="section" id="s1">
+  <div class="section-header"><span class="sec-num">01</span><h2 class="sec-title">Purpose &amp; MVP Aim</h2></div>
+  <p class="lead">This document defines the complete functional specification for the Paideia MVP — updated to include the full system module breakdown, chosen technology stack with rationale, implementation workarounds, and the Rendering Engine specification. It supersedes v1.0.</p>
+  <p>The MVP answers one question. Everything in this document exists in service of answering it cleanly.</p>
+  <div class="aim-box">
+    <div class="aim-label">MVP Primary Hypothesis</div>
+    <div class="aim-stmt">An AI agent, given only a teacher's plain-language course brief and a student's accumulated session history, can generate coherent, sequential, and meaningfully personalised lessons — rendered beautifully including interactive visual blocks — that constitute a complete course over time.</div>
+  </div>
+  <p>If this is proven, the full product is buildable. If lessons are incoherent, shallow, or the rendering breaks — no amount of surrounding infrastructure saves the product. The loop and its rendering are the product.</p>
+  <div class="callout cn"><strong>What Changed in v2.0</strong>This version adds Section 4 (System Modules), Section 5 (Tech Stack Decisions including workarounds), and the full Rendering Engine specification in Section 13. All prior functional requirements from v1.0 are retained and renumbered.</div>
+</div>
+
+<!-- S2: SCOPE -->
+<div class="section" id="s2">
+  <div class="section-header"><span class="sec-num">02</span><h2 class="sec-title">Scope</h2></div>
+  <p>The MVP scope is unchanged from v1.0. The rendering engine is now explicitly named as an MVP deliverable — it was implicit before. Interactive visual generation is MVP scope because it is load-bearing for the hypothesis: that the system can generate a genuinely useful, personalised learning experience.</p>
+  <div class="scope-grid">
+    <div class="scope-col scope-in">
+      <h4>In Scope — MVP</h4>
+      <div class="scope-item">Admin account creation and school setup</div>
+      <div class="scope-item">Teacher and student account management by admin</div>
+      <div class="scope-item">Teacher creates and edits a plain-text course brief</div>
+      <div class="scope-item">Teacher manages enrollment for their own courses (admin as fallback)</div>
+      <div class="scope-item">Teacher archives their own courses; admin can archive any course</div>
+      <div class="scope-item">Student initiates a learning session</div>
+      <div class="scope-item">AI agent generates one structured lesson per session</div>
+      <div class="scope-item">Lesson rendered via three-renderer engine (text/callout, interactive, assessment)</div>
+      <div class="scope-item">Interactive HTML blocks sandboxed via iframe</div>
+      <div class="scope-item">AI agent generates 4 MCQ questions per lesson</div>
+      <div class="scope-item">Question-by-question assessment with immediate feedback</div>
+      <div class="scope-item">Session history stored per student per course</div>
+      <div class="scope-item">History used as context for all subsequent generation</div>
+      <div class="scope-item">Teacher sees basic student completion list</div>
+      <div class="scope-item">Email/password auth via Django (simplejwt)</div>
+      <div class="scope-item">Web browser interface — desktop (Next.js)</div>
+    </div>
+    <div class="scope-col scope-out">
+      <h4>Out of Scope — MVP</h4>
+      <div class="scope-item">National curriculum standards mapping</div>
+      <div class="scope-item">Prerequisite / dependency graphs</div>
+      <div class="scope-item">Teacher content review and approval queue</div>
+      <div class="scope-item">Content moderation or safety layer</div>
+      <div class="scope-item">Parent portal or guardian visibility</div>
+      <div class="scope-item">Cohort analytics or class-level reporting</div>
+      <div class="scope-item">SSO / OAuth / third-party identity providers</div>
+      <div class="scope-item">Offline or low-connectivity mode</div>
+      <div class="scope-item">Video or external media embeds</div>
+      <div class="scope-item">Gamification, streaks, badges</div>
+      <div class="scope-item">Mobile application</div>
+      <div class="scope-item">Open-ended or manually graded assessments</div>
+      <div class="scope-item">Data export, compliance reporting, audit tools</div>
+      <div class="scope-item">Billing, licensing, or subscription management</div>
+    </div>
+  </div>
+</div>
+
+<!-- S3: ACTORS -->
+<div class="section" id="s3">
+  <div class="section-header"><span class="sec-num">03</span><h2 class="sec-title">System Actors</h2></div>
+  <p>Three human actors and one system actor. No other roles exist in this version.</p>
+  <table class="rtable" style="margin-top:18px;">
+    <thead><tr><th>Actor</th><th>Type</th><th>Primary Responsibility</th><th>System Access</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Administrator</strong></td><td>Human</td><td>Creates and manages the school account. Creates teacher and student accounts. Enrolls students as a fallback for bulk setup. Deactivates accounts. Reassigns courses when a teacher leaves. Archives any course in the school.</td><td>Full admin panel. Enrollment access across all courses. Course reassignment. Cannot author courses or take lessons.</td></tr>
+      <tr><td><strong>Teacher</strong></td><td>Human</td><td>Authors the course brief. Manages enrollment for their own courses. Views student progress for their own courses only. Archives their own courses. One teacher per course in MVP — teacher_id is nullable to support unassigned state after deactivation.</td><td>Course brief editor. Enrollment management for own courses only. Read-only progress view scoped to own courses.</td></tr>
+      <tr><td><strong>Student</strong></td><td>Human</td><td>Takes lessons. Completes assessments. Cannot configure anything.</td><td>Learning interface only. Sees own progress. Cannot see other students.</td></tr>
+      <tr><td><strong>AI Agent</strong></td><td>System</td><td>Generates lesson content and assessment questions on demand. Reads session history. Produces no output outside lesson and assessment generation.</td><td>Internal service. Called by the Session Orchestration module.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- S4: SYSTEM MODULES -->
+<div class="section" id="s4">
+  <div class="section-header"><span class="sec-num">04</span><h2 class="sec-title">System Modules Overview</h2></div>
+  <p class="lead">Paideia MVP is composed of eight functional modules. Each module has a single responsibility, a defined set of inputs and outputs, and a clear boundary. This separation is intentional — modules can be tested, debugged, and replaced independently.</p>
+  <p>The diagram below shows how they connect. Sections 6–16 specify each module in full.</p>
+
+  <div class="arch-flow" style="margin-top:24px;">
+    <div class="af-label">Module Interaction Map — MVP</div>
+    <div class="af-row"><div class="af-box af-next">Auth &amp; Identity (M1)</div><div class="af-arr">→</div><div class="af-box af-next">Account Management (M2)</div><div class="af-arr">→</div><div class="af-box af-next">Course Brief (M3)</div></div>
+    <div style="margin:6px 0 6px 120px;color:#a0a09c;font-family:'IBM Plex Mono',monospace;font-size:11px;">↓ Teacher enrolls student (Admin as fallback)</div>
+    <div class="af-row"><div class="af-box af-next">Enrollment (M4)</div><div class="af-arr">→</div><div class="af-box af-sys">Session Orchestration (M5)</div></div>
+    <div style="margin:6px 0 6px 200px;color:#a0a09c;font-family:'IBM Plex Mono',monospace;font-size:11px;">↓ Student opens session</div>
+    <div class="af-row" style="margin-left:200px;"><div class="af-box af-sys">Context Assembly (M6)</div><div class="af-arr">→</div><div class="af-box af-agent">AI Agent (M7)</div></div>
+    <div style="margin:6px 0 6px 420px;color:#a0a09c;font-family:'IBM Plex Mono',monospace;font-size:11px;">↓ Returns lesson JSON + assessment JSON</div>
+    <div class="af-row" style="margin-left:200px;"><div class="af-box af-render">Rendering Engine (M8)</div><div class="af-arr">→</div><div class="af-box af-next">Student sees lesson</div></div>
+    <div style="margin:6px 0 6px 200px;color:#a0a09c;font-family:'IBM Plex Mono',monospace;font-size:11px;">↓ Assessment complete</div>
+    <div class="af-row" style="margin-left:200px;"><div class="af-box af-store">Session History Store (within M5)</div><div class="af-arr">→</div><div class="af-box af-next">Next session: feeds M6</div></div>
+  </div>
+
+  <div class="module-grid" style="margin-top:28px;">
+    <div class="module-card mc-auth">
+      <div class="mc-id">MODULE 01 · M1</div>
+      <div class="mc-name">Auth &amp; Identity</div>
+      <div class="mc-desc">Manages authentication via Django's auth framework with simplejwt. Issues JWTs on login and validates them on every request. The User model is the identity source of truth — no external bridge. All requests pass through this module before reaching any other.</div>
+      <div class="mc-deps">Layer: <span>Cross-cutting · Django middleware</span></div>
+    </div>
+    <div class="module-card mc-brief">
+      <div class="mc-id">MODULE 02 · M2</div>
+      <div class="mc-name">Account Management</div>
+      <div class="mc-desc">Admin-only module for creating and managing user accounts. Writes directly to the users table with a generated temporary password. Controls account activation, deactivation, and course reassignment when a teacher leaves. No self-service registration in MVP.</div>
+      <div class="mc-deps">Depends on: <span>M1</span></div>
+    </div>
+    <div class="module-card mc-brief">
+      <div class="mc-id">MODULE 03 · M3</div>
+      <div class="mc-name">Course Brief</div>
+      <div class="mc-desc">Teacher-facing module for creating, editing, and managing course briefs. The brief is the AI agent's sole instructional input. Manages course lifecycle states: draft → active → archived.</div>
+      <div class="mc-deps">Depends on: <span>M1, M2</span></div>
+    </div>
+    <div class="module-card mc-brief">
+      <div class="mc-id">MODULE 04 · M4</div>
+      <div class="mc-name">Enrollment</div>
+      <div class="mc-desc">Teacher-owned module for adding and removing students from their own courses. Teachers see all students in the school and manage their own class composition. Admins retain enrollment access as a fallback for bulk term setup. Each enrollment maintains an independent session history and generation context.</div>
+      <div class="mc-deps">Depends on: <span>M1, M2, M3</span></div>
+    </div>
+    <div class="module-card mc-session">
+      <div class="mc-id">MODULE 05 · M5</div>
+      <div class="mc-name">Session Orchestration</div>
+      <div class="mc-desc">The coordination hub of the system. Manages session state machine (pending → active → complete). Triggers context assembly, AI agent call, rendering, assessment delivery, and history writing in the correct sequence. Also houses the Session History Store.</div>
+      <div class="mc-deps">Depends on: <span>M4, M6, M7, M8</span> · Coordinates all</div>
+    </div>
+    <div class="module-card mc-session">
+      <div class="mc-id">MODULE 06 · M6</div>
+      <div class="mc-name">Context Assembly</div>
+      <div class="mc-desc">Reads the course brief and the enrollment's full session history and assembles them into a structured prompt context object. Applies the summarisation strategy for long histories. The quality of its output determines lesson quality.</div>
+      <div class="mc-deps">Depends on: <span>M3, M5 (history store)</span></div>
+    </div>
+    <div class="module-card mc-ai">
+      <div class="mc-id">MODULE 07 · M7</div>
+      <div class="mc-name">AI Agent</div>
+      <div class="mc-desc">Makes two sequential calls to the Anthropic API: one for lesson generation (with streaming), one for assessment generation. Parses structured output. Validates schemas. Handles failures and fallbacks. Stores the agent plan, full prompt context, and raw outputs for diagnostics.</div>
+      <div class="mc-deps">Depends on: <span>M6</span> · External: <span>Anthropic API</span></div>
+    </div>
+    <div class="module-card mc-render">
+      <div class="mc-id">MODULE 08 · M8</div>
+      <div class="mc-name">Rendering Engine</div>
+      <div class="mc-desc">Client-side module (Next.js). Routes lesson blocks to one of three sub-renderers: Markdown/text renderer, sandboxed interactive iframe renderer, and MCQ assessment state machine. Each renderer is isolated. Fallback logic prevents interactive block failures from breaking lesson delivery.</div>
+      <div class="mc-deps">Layer: <span>Frontend only · No Django dependency</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- S5: TECH STACK -->
+<div class="section" id="s5">
+  <div class="section-header"><span class="sec-num">05</span><h2 class="sec-title">Technology Stack Decisions</h2></div>
+  <p class="lead">Every technology choice in this stack was made against specific constraints: the system generates content via slow AI API calls, serves minors, runs on a single deployment platform, and must be buildable by a small team. This section documents what was chosen, why, and what workarounds were required.</p>
+
+  <div class="subsection" id="s5-1">
+    <div class="sub-header"><span class="sub-num">5.1</span><span class="sub-title">Evaluation Criteria</span></div>
+    <p>Before selecting any technology, the following criteria were established and weighted in order:</p>
+    <table class="rtable">
+      <thead><tr><th>Criterion</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Async I/O support</strong></td><td>AI generation calls hold a connection open for up to 30 seconds. Any framework that cannot handle async I/O without blocking a thread would require a separate task queue just to function correctly.</td></tr>
+        <tr><td><strong>Single-platform deployment</strong></td><td>The entire stack — API, frontend, database — must run on Railway to reduce operational complexity and cognitive overhead for a small build team.</td></tr>
+        <tr><td><strong>Auth integration quality</strong></td><td>The closed access model (admin-created accounts, no public sign-up, three roles, email/password only) is exactly what Django's built-in auth covers. Using it removes an external dependency, a third-party child-data processor, and per-seat cost — at the price of owning the login UI and password-reset emails, which Django provides battle-tested primitives for.</td></tr>
+        <tr><td><strong>JSONB / structured data support</strong></td><td>The lesson block schema and assessment questions are structured JSON. The database must support JSONB natively — querying within JSON fields without serialising entire documents.</td></tr>
+        <tr><td><strong>Developer velocity</strong></td><td>MVP must be buildable fast. Frameworks with strong conventions, good ORM support, and large ecosystems reduce decision fatigue and accelerate delivery.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection" id="s5-2">
+    <div class="sub-header"><span class="sub-num">5.2</span><span class="sub-title">Chosen Stack</span></div>
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="stack-tech">Django 5.x + DRF</div>
+        <div class="stack-role">API Backend · Business Logic · ORM</div>
+        <div class="stack-why">Django's ORM maps cleanly to the relational data model. DRF provides serialisers, viewsets, and permission classes that directly implement the role-based access model. The ecosystem (django-cors-headers, migrations, admin) reduces boilerplate. Django 5.x supports async views natively — critical for AI calls.</div>
+        <div class="stack-workaround"><strong>Hard Rule: No User-Facing HTML</strong>Django serves no HTML to students, teachers, or admins — every user-facing endpoint returns JSON, and the entire role experience is rendered by Next.js. The Django admin site is the one permitted exception: it stays enabled for internal engineering data inspection, which means django.contrib.staticfiles and a minimal TEMPLATES backend remain configured (the admin needs them to render). It is reachable only over Railway's private network or a protected path, never publicly. The rule is "no user-facing HTML" — not "no templates at all." This must be settled before the first view is written.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-tech">Django Auth + simplejwt</div>
+        <div class="stack-role">Authentication · Identity · Token Issuance</div>
+        <div class="stack-why">Django's built-in auth framework (django.contrib.auth) handles password hashing, the user model, and the password-reset flow. djangorestframework-simplejwt issues access and refresh tokens on login and validates them on every request. Because the access model is closed — admin creates every account, no public sign-up — none of Clerk's strengths (social login, self-registration, magic links) are needed. The User model is the single identity source of truth.</div>
+        <div class="stack-workaround"><strong>The User Model IS the Identity</strong>There is no external identity provider and therefore no bridge to maintain. The Django User model carries email, hashed password, role, school_id, is_active, and force_password_change directly. Authentication (who is this) and authorization (what may they do) both run against this one record. This is simpler than an external-provider setup: there is no risk of sync drift between two user stores because there is only one store. Password hashing uses Django's default (PBKDF2, or argon2 if the argon2-cffi package is added) — never store or log plaintext.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-tech">Next.js 14 (App Router)</div>
+        <div class="stack-role">Frontend · All Three Role Interfaces</div>
+        <div class="stack-why">Next.js was chosen for three reasons: the lesson experience needs a reactive client (streaming text, sandboxed interactive iframes, the assessment state machine) that server-rendered templates handle poorly. App Router route groups map cleanly to the three role interfaces. Server Components reduce client bundle size for content-heavy lesson pages. The login screen and token storage are built as first-class Paideia-styled screens rather than delegated to a hosted provider — which is more consistent with the design system.</div>
+        <div class="stack-workaround"><strong>Streaming Lesson Delivery</strong>The lesson generation call can take 15–25 seconds. Rather than waiting for the full response and then rendering, the AI agent streams tokens via the Anthropic SDK. Django reads the stream and re-streams it to the Next.js frontend via a Server-Sent Events (SSE) endpoint. The student sees the lesson build word by word — identical to how Claude responds in this interface. This must be built from the start; retrofitting streaming into a completed non-streaming implementation is a significant architectural change, not a feature addition.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-tech">PostgreSQL (Railway)</div>
+        <div class="stack-role">Primary Database</div>
+        <div class="stack-why">PostgreSQL is non-negotiable given the data model. The lesson blocks schema and assessment question arrays are JSONB fields — queried within Django using JSONField. Railway provides managed PostgreSQL with automatic backups, a connection pooler, and a dashboard for inspection during development. No separate database host needed.</div>
+        <div class="stack-workaround"><strong>Async Driver Required</strong>Standard psycopg2 is synchronous. Using it with Django async views causes a SynchronousOnlyOperation error. The driver must be psycopg3 (the package name is psycopg, not psycopg3). psycopg3 is async-native and works correctly with Django's async ORM. This must be set in requirements from day one — swapping drivers mid-project requires testing all ORM queries.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-tech">Anthropic Python SDK</div>
+        <div class="stack-role">AI Agent · Lesson &amp; Assessment Generation</div>
+        <div class="stack-why">The official Anthropic SDK has a first-class async client (AsyncAnthropic) that integrates cleanly with Django async views. It supports streaming natively via the messages.stream() async context manager. The SDK handles retries, rate limiting, and API versioning automatically.</div>
+        <div class="stack-workaround"><strong>Two Separate Calls</strong>Lesson generation and assessment generation are two separate SDK calls, never combined. This is intentional: independent failure handling, independent prompt optimisation, and independent streaming (lessons stream to the student; assessment generation happens server-side after lesson delivery starts). The assessment call is non-streaming and runs concurrently with lesson streaming using asyncio.create_task().</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-tech">Railway</div>
+        <div class="stack-role">Full-Stack Deployment · All Services</div>
+        <div class="stack-why">Railway hosts the Next.js frontend, Django API, and PostgreSQL database on a single platform. For a small team building an MVP, the operational simplicity of one dashboard, one billing account, and one place to read logs across all services outweighs any marginal performance gains from a multi-cloud setup. Railway supports Python (Django via Gunicorn + Uvicorn workers for async), Node.js, and PostgreSQL natively.</div>
+        <div class="stack-workaround"><strong>Gunicorn + Uvicorn Workers</strong>Standard Gunicorn workers are synchronous (WSGI). Django async views require ASGI workers. The Procfile must use: gunicorn paideia.asgi:application -k uvicorn.workers.UvicornWorker. Without this, async views silently fall back to synchronous execution — AI calls block threads and the system degrades under any concurrent load. This is the single most common Django async deployment mistake.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection" id="s5-3">
+    <div class="sub-header"><span class="sub-num">5.3</span><span class="sub-title">Workarounds Summary</span></div>
+    <p>The following workarounds were identified during stack selection. Each one is a potential failure mode if ignored. They are collected here as a quick reference for the engineering team.</p>
+    <table class="rtable">
+      <thead><tr><th>Workaround</th><th>Without it</th><th>Implementation</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Async views for AI calls</strong></td><td>Each AI call holds a Django thread for up to 30 seconds. Under 10 concurrent students the server saturates.</td><td>All views that trigger AI calls must be defined as <code>async def</code>. Requires ASGI deployment.</td></tr>
+        <tr><td><strong>ASGI deployment (Uvicorn workers)</strong></td><td>Async views silently execute synchronously under WSGI, blocking threads despite the async keyword.</td><td>Procfile: <code>gunicorn paideia.asgi:application -k uvicorn.workers.UvicornWorker</code></td></tr>
+        <tr><td><strong>psycopg3 async driver</strong></td><td>psycopg2 raises SynchronousOnlyOperation inside async views when any ORM query is made.</td><td>Install <code>psycopg[binary]</code> not <code>psycopg2</code>. Set DATABASE_URL accordingly.</td></tr>
+        <tr><td><strong>Streaming lesson delivery</strong></td><td>Students stare at a blank screen for 15–25 seconds. Perceived as broken. High abandonment on first session.</td><td>Django StreamingHttpResponse over a POST endpoint. The browser consumes it with <code>fetch()</code> + a ReadableStream reader — not EventSource, which is GET-only and cannot open a state-creating POST.</td></tr>
+        <tr><td><strong>Concurrent assessment generation</strong></td><td>A sequential assessment call after the lesson finishes makes the student wait a second time before they can be assessed.</td><td><code>asyncio.create_task()</code> creates the assessment task when lesson streaming begins; the task blocks until the lesson body is complete, then generates. The benefit is overlap with the student's reading time — the assessment is ready by the time they finish reading, not concurrent with lesson generation itself.</td></tr>
+        <tr><td><strong>JWT auth state on a stateless API</strong></td><td>The async streaming endpoint and the sync REST endpoints all need the same identity check, cheaply, without a session lookup on every call.</td><td>simplejwt issues a signed access token on login; every request carries it as <code>Authorization: Bearer</code>. Validation is a signature check — no database hit for auth itself. A short access-token lifetime plus a refresh token balances security and convenience.</td></tr>
+        <tr><td><strong>No user-facing HTML</strong></td><td>A template-driven HTML layer creates pressure toward a mixed architecture that is hard to maintain.</td><td>No HTML is served to end users — all role UIs are Next.js. The Django admin remains for internal inspection, so staticfiles and a minimal TEMPLATES backend stay configured (note: templates are configured via the TEMPLATES setting, not INSTALLED_APPS). CORS is scoped to the Next.js domain only.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection" id="s5-4">
+    <div class="sub-header"><span class="sub-num">5.4</span><span class="sub-title">Deployment Architecture (Railway)</span></div>
+    <div class="arch-flow">
+      <div class="af-label">Production Architecture — All on Railway</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#e4e4e0;margin-bottom:20px;">
+        <div style="background:#f8f8f6;padding:16px 18px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#a0a09c;letter-spacing:0.15em;margin-bottom:8px;">SERVICE 1</div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:6px;">Next.js Frontend</div>
+          <div style="font-size:12px;color:#6e6e6a;">Railway Node.js service. App Router. Login screen + token storage. Stream client for streaming lessons. Static assets served via Railway CDN.</div>
+        </div>
+        <div style="background:#f8f8f6;padding:16px 18px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#a0a09c;letter-spacing:0.15em;margin-bottom:8px;">SERVICE 2</div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:6px;">Django API</div>
+          <div style="font-size:12px;color:#6e6e6a;">Railway Python service. Gunicorn + Uvicorn workers (ASGI). django-cors-headers scoped to frontend URL. Environment variable for model version.</div>
+        </div>
+        <div style="background:#f8f8f6;padding:16px 18px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#a0a09c;letter-spacing:0.15em;margin-bottom:8px;">SERVICE 3</div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:6px;">PostgreSQL</div>
+          <div style="font-size:12px;color:#6e6e6a;">Railway managed Postgres. Daily backups. Private networking between Django and DB (no public endpoint needed). psycopg3 driver.</div>
+        </div>
+      </div>
+      <div class="af-row"><div class="af-box af-next">Student browser</div><div class="af-arr">→</div><div class="af-box af-next">Next.js (Railway)</div><div class="af-arr">→ JWT →</div><div class="af-box af-sys">Django API (Railway)</div></div>
+      <div class="af-indent" style="margin-left:320px;">↓ async view triggered</div>
+      <div class="af-row" style="margin-left:320px;"><div class="af-box af-agent">Anthropic API</div><div class="af-arr">← stream →</div><div class="af-box af-sys">Django streaming endpoint</div><div class="af-arr">→ stream →</div><div class="af-box af-next">Next.js fetch reader</div></div>
+      <div class="af-indent" style="margin-left:320px;">↓ lesson stored + assessment generated concurrently</div>
+      <div class="af-row" style="margin-left:320px;"><div class="af-box af-store">PostgreSQL (Railway)</div><div class="af-arr">← read/write →</div><div class="af-box af-sys">Django ORM (psycopg3)</div></div>
+    </div>
+    <div class="callout cw" style="margin-top:20px;"><strong>Environment Variables</strong>The following must be set in Railway environment config and never hardcoded: ANTHROPIC_API_KEY, ANTHROPIC_MODEL_VERSION, DATABASE_URL, DJANGO_SECRET_KEY, JWT_SIGNING_KEY (or reuse DJANGO_SECRET_KEY for simplejwt), JWT_ACCESS_LIFETIME, JWT_REFRESH_LIFETIME, ALLOWED_HOSTS, CORS_ALLOWED_ORIGINS, and the email-backend credentials for password-reset and welcome emails. Rotating ANTHROPIC_MODEL_VERSION without a code deploy is a deliberate design capability.</div>
+  </div>
+</div>
+
+<!-- S6: AUTH -->
+<div class="section" id="s6">
+  <div class="section-header"><span class="sec-num">06</span><h2 class="sec-title">Module 1 — Auth &amp; Identity</h2></div>
+  <p>Authentication is owned entirely by Django's auth framework. There is no external identity provider — the User model is the single source of truth for identity, role, and school membership. simplejwt issues tokens on login; a permission layer enforces authorization on every request.</p>
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">6.1</span><span class="sub-title">Django Authentication Class</span></div>
+    <div class="codeblock">
+      <div class="cb-label">models.py + auth — Django User model &amp; simplejwt</div>
+      <pre>
+<span class="c-comment"># The User model IS the identity. No external provider, no bridge.</span>
+<span class="c-kw">from</span> django.contrib.auth.models <span class="c-kw">import</span> AbstractBaseUser
+<span class="c-kw">from</span> rest_framework_simplejwt.authentication <span class="c-kw">import</span> JWTAuthentication
+<span class="c-kw">from</span> rest_framework.permissions <span class="c-kw">import</span> BasePermission
+
+<span class="c-entity">class User</span>(AbstractBaseUser):
+    email        = models.EmailField(unique=True)
+    name         = models.CharField(max_length=<span class="c-str">200</span>)
+    role         = models.CharField(max_length=<span class="c-str">20</span>)   <span class="c-comment"># admin | teacher | student</span>
+    school       = models.ForeignKey(School, on_delete=models.PROTECT)
+    is_active    = models.BooleanField(default=<span class="c-kw">True</span>)
+    force_password_change = models.BooleanField(default=<span class="c-kw">True</span>)
+    <span class="c-comment"># password hash is managed by AbstractBaseUser (PBKDF2 by default)</span>
+    USERNAME_FIELD = <span class="c-str">'email'</span>
+
+<span class="c-comment"># Authentication: simplejwt validates the signed token — no DB hit for auth.</span>
+<span class="c-comment"># Set as DEFAULT_AUTHENTICATION_CLASSES in DRF settings:</span>
+<span class="c-comment">#   'rest_framework_simplejwt.authentication.JWTAuthentication'</span>
+<span class="c-comment"># The token's user_id claim resolves request.user to the User row above.</span>
+
+<span class="c-comment"># Authorization: DRF permission classes run against request.user.</span>
+<span class="c-entity">class IsTeacher</span>(BasePermission):
+    <span class="c-kw">def</span> <span class="c-entity">has_permission</span>(self, request, view):
+        <span class="c-kw">return</span> request.user.role == <span class="c-str">'teacher'</span>
+
+<span class="c-entity">class IsSameSchool</span>(BasePermission):
+    <span class="c-comment"># Applied to all viewsets — ensures no cross-school data access</span>
+    <span class="c-kw">def</span> <span class="c-entity">has_object_permission</span>(self, request, view, obj):
+        <span class="c-kw">return</span> obj.school_id == request.user.school_id</pre>
+    </div>
+  </div>
+  <table class="rtable" style="margin-top:20px;">
+    <thead><tr><th style="width:100px">Req ID</th><th>Requirement</th><th style="width:90px">Priority</th></tr></thead>
+    <tbody>
+      <tr><td class="req-id">AUTH-01</td><td>All API endpoints require a valid Django-issued JWT in the Authorization header. Requests without a token return 401. Expired access tokens return 401 with a code that prompts the client to use its refresh token; an invalid refresh token forces re-login.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AUTH-02</td><td>simplejwt's JWTAuthentication is set as the default authentication class in DRF settings. No viewset declares authentication explicitly. The token's user_id claim resolves request.user.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AUTH-03</td><td>POST /auth/login accepts email and password, verifies against the stored hash, and returns an access token and a refresh token. Invalid credentials return 401 with a generic message (never revealing whether the email exists). A deactivated account (is_active=False) cannot obtain tokens.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AUTH-04</td><td>POST /auth/refresh exchanges a valid refresh token for a new access token. Access tokens are short-lived (e.g. 30 minutes); refresh tokens are longer-lived (e.g. 7 days). Both lifetimes are environment-configurable.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AUTH-05</td><td>All viewsets apply the IsSameSchool permission. A student from School A must never be able to read, write, or infer the existence of data belonging to School B, even with a valid JWT.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AUTH-06</td><td>On the Next.js side, a route guard checks for a valid token and the user's role (read from GET /me) before rendering any role route group (/admin/*, /teacher/*, /student/*). Unauthenticated users are redirected to /sign-in. This is a UX guard; the API is the real enforcement.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AUTH-07</td><td>Passwords are hashed with Django's password hashers (PBKDF2 by default; argon2 if argon2-cffi is installed). Plaintext is never stored or logged. Password reset uses Django's built-in token-based reset flow, delivered by the configured email backend.</td><td><span class="pri pm">MUST</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- S7: ACCOUNT MANAGEMENT -->
+<div class="section" id="s7">
+  <div class="section-header"><span class="sec-num">07</span><h2 class="sec-title">Module 2 — Account Management</h2></div>
+  <p>Account creation is admin-only. No self-registration. When an admin creates an account, the system writes a User row directly with the assigned role and school, sets a generated temporary password, and flags force_password_change. Django's email backend sends the welcome message with the temporary password.</p>
+  <table class="rtable" style="margin-top:18px;">
+    <thead><tr><th style="width:100px">Req ID</th><th>Requirement</th><th style="width:90px">Priority</th></tr></thead>
+    <tbody>
+      <tr><td class="req-id">ACC-01</td><td>Admin creates a teacher or student account by providing name, email, and role. The system creates the User row with role and school set, generates a temporary password, sets force_password_change=True, and sends the welcome email with the temporary password via the configured email backend.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ACC-02</td><td>A user whose force_password_change flag is True is required to set a new password before any other endpoint will serve them. The flag is cleared on successful password change. Enforced server-side: the API rejects non-password-change requests from such a user with a code the frontend redirects on.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ACC-03</td><td>Admin can deactivate any account (teacher or student) by setting is_active=False. A deactivated user cannot log in or refresh tokens (AUTH-03). Data is retained in full.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ACC-04</td><td>Admin sees a paginated list of all teachers and students in their school with status indicators (active / deactivated).</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ACC-05</td><td>Deactivating a teacher account must not archive, suspend, or alter any of their courses. All active courses remain active. Enrolled students retain full access and can continue taking sessions. The admin is shown a warning at deactivation time listing the teacher's active courses and enrolled student counts, and is prompted to reassign each course to another teacher or leave it unassigned. Unassigned courses remain fully functional — the teacher_id field is nullable for this reason.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ACC-06</td><td>Admin can reassign a course's teacher_id to any active teacher in the school. This is the only operation that can change teacher_id on an active course. It requires an explicit confirmation step. The new teacher immediately gains progress view access and enrollment management for that course.</td><td><span class="pri pm">MUST</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- S8: COURSE BRIEF -->
+<div class="section" id="s8">
+  <div class="section-header"><span class="sec-num">08</span><h2 class="sec-title">Module 3 — Course Brief</h2></div>
+  <p>The course brief is the AI agent's sole instructional input. Its quality is the primary determinant of lesson quality. The interface must actively guide teachers to write useful briefs — field-level examples, character counts, and minimum guidance hints are functional requirements, not UI polish.</p>
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">8.1</span><span class="sub-title">Course Brief Fields</span></div>
+    <div class="field-spec">
+      <div class="field-row fh"><div class="field-cell">Field</div><div class="field-cell">Type</div><div class="field-cell">Notes for Engineering</div></div>
+      <div class="field-row"><div class="field-cell fn">course_title</div><div class="field-cell ft">VARCHAR(200)</div><div class="field-cell">Display name. Shown in all dashboards. E.g. "Biology — Year 10, Term 2".</div></div>
+      <div class="field-row"><div class="field-cell fn">subject</div><div class="field-cell ft">VARCHAR(100)</div><div class="field-cell">Subject area. Passed verbatim to agent system prompt. E.g. "Biology", "Mathematics".</div></div>
+      <div class="field-row"><div class="field-cell fn">target_level</div><div class="field-cell ft">VARCHAR(100)</div><div class="field-cell">Free text. Agent uses this to calibrate vocabulary and depth. E.g. "Year 10", "Age 12–13".</div></div>
+      <div class="field-row"><div class="field-cell fn">learning_outcomes</div><div class="field-cell ft">TEXT (4000)</div><div class="field-cell">What students must know by course end. Agent's primary success metric. Bullet list recommended. Minimum 100 chars enforced.</div></div>
+      <div class="field-row"><div class="field-cell fn">topic_sequence</div><div class="field-cell ft">TEXT (4000)</div><div class="field-cell">Rough topic order. Agent fills gaps. E.g. "1. Cell biology 2. Genetics 3. Evolution". Minimum 80 chars.</div></div>
+      <div class="field-row"><div class="field-cell fn">exam_context</div><div class="field-cell ft">TEXT (2000)</div><div class="field-cell">Optional. Exam being prepared for. Agent biases toward exam-relevant depth. E.g. "WAEC Biology — past topics include..."</div></div>
+      <div class="field-row"><div class="field-cell fn">special_instructions</div><div class="field-cell ft">TEXT (2000)</div><div class="field-cell">Optional. Hard constraints for agent. E.g. "Do not cover evolution — teacher-led only." Agent treats these as absolute rules.</div></div>
+      <div class="field-row"><div class="field-cell fn">approximate_lessons</div><div class="field-cell ft">INTEGER</div><div class="field-cell">Guides agent on pacing. Range 10–120. Stored and passed to agent as pacing context. Not a hard cap.</div></div>
+    </div>
+  </div>
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">8.2</span><span class="sub-title">Requirements</span></div>
+    <table class="rtable">
+      <thead><tr><th style="width:100px">Req ID</th><th>Requirement</th><th style="width:90px">Priority</th></tr></thead>
+      <tbody>
+        <tr><td class="req-id">BRIEF-01</td><td>A teacher can create and activate a course only after all required fields pass minimum length validation. The UI shows field-level validation with a plain-language message (not just "too short").</td><td><span class="pri pm">MUST</span></td></tr>
+        <tr><td class="req-id">BRIEF-02</td><td>Courses can be saved as drafts without meeting minimum field lengths. Draft courses cannot be enrolled into. Drafts are not visible to students.</td><td><span class="pri pm">MUST</span></td></tr>
+        <tr><td class="req-id">BRIEF-03</td><td>A teacher can edit any brief field at any time. Edits apply to the next AI generation call only — previously delivered lessons are immutable. If the course has enrolled students with at least one completed session, the UI shows a warning: "Editing this brief will change how future lessons are generated. Lessons already delivered are not affected." The teacher must acknowledge before saving.</td><td><span class="pri pm">MUST</span></td></tr>
+        <tr><td class="req-id">BRIEF-04</td><td>Each text field in the UI displays: current character count, minimum required, and a collapsible example of a well-written entry for that field specifically.</td><td><span class="pri pm">MUST</span></td></tr>
+        <tr><td class="req-id">BRIEF-05</td><td>Course archiving: a teacher can archive their own course at any time. An admin can archive any course in their school. Once archived, no new sessions can start and no new enrollments are accepted. Enrolled students retain read access to their completed session history. Existing history is fully preserved.</td><td><span class="pri pm">MUST</span></td></tr>
+        <tr><td class="req-id">BRIEF-06</td><td>The full state of the course brief at the time of each lesson's generation is captured in lessons.prompt_context (this happens as part of context assembly). This is the authoritative record of what the agent was instructed with for any given lesson — essential for diagnosing quality issues when a brief has since been edited.</td><td><span class="pri pm">MUST</span></td></tr>
+        <tr><td class="req-id">BRIEF-07</td><td>teacher_id on an active course is immutable through the course brief editor. A teacher cannot transfer or reassign their own course. teacher_id can only be changed by an admin via the dedicated reassignment flow (ACC-06). Attempts to update teacher_id via the API without admin role return 403.</td><td><span class="pri pm">MUST</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S9: ENROLLMENT -->
+<div class="section" id="s9">
+  <div class="section-header"><span class="sec-num">09</span><h2 class="sec-title">Module 4 — Enrollment</h2></div>
+  <p>Enrollment links a student to a course. Ownership sits with the teacher — they know their class composition and should not need to route every enrollment change through an administrator. Admins retain enrollment access as a fallback for bulk term setup (e.g. importing a class list at the start of the year) and for situations where the teacher is unavailable.</p>
+  <p>Each enrollment is fully independent. Two students enrolled in the same course have completely separate generation contexts, session histories, and adaptation paths.</p>
+
+  <div class="callout cn" style="margin-top:20px;"><strong>RBAC Rule</strong>Teachers can only enroll or unenroll students into courses where course.teacher_id = request.user.id. A teacher cannot touch another teacher's course enrollments. Admins can manage enrollments across all courses in their school. This is enforced in a single DRF permission class — not in view logic.</div>
+
+  <table class="rtable" style="margin-top:20px;">
+    <thead><tr><th style="width:100px">Req ID</th><th>Requirement</th><th style="width:90px">Priority</th></tr></thead>
+    <tbody>
+      <tr><td class="req-id">ENROL-01</td><td>A teacher can enroll one or more students into any of their own active courses from a multi-select list showing all active students in the school. Students already enrolled in the course are excluded from the picker.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ENROL-02</td><td>A teacher can unenroll a student from their own course. The student loses course access immediately. Session history is retained. The teacher sees a confirmation dialog before the action completes.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ENROL-03</td><td>An admin can enroll or unenroll students across any course in their school. This power exists for bulk term-start setup and teacher-absence scenarios — not as the primary enrollment workflow.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ENROL-04</td><td>A student can be enrolled in multiple courses simultaneously across different teachers. Each enrollment is fully independent in terms of session history and generation context.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ENROL-05</td><td>Re-enrolling a previously unenrolled student reactivates the existing enrollment record rather than creating a duplicate. The UNIQUE constraint on (course_id, student_id) is enforced at the database level. Prior session history is preserved and visible to the student and teacher on reactivation.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ENROL-06</td><td>Only active courses can receive enrollments. Draft and archived courses do not appear in the enrollment picker for either teacher or admin.</td><td><span class="pri pm">MUST</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- S10: SESSION ORCHESTRATION -->
+<div class="section" id="s10">
+  <div class="section-header"><span class="sec-num">10</span><h2 class="sec-title">Module 5 — Session Orchestration</h2></div>
+  <p class="lead">The session orchestration module is the coordination hub. It manages the full session lifecycle and sequences every other module. A session is a state machine with five states.</p>
+  <div class="codeblock">
+    <div class="cb-label">Session State Machine</div>
+    <pre>
+<span class="c-comment">PENDING ──► GENERATING ──► ACTIVE ──► ASSESSING ──► COMPLETE
+                                          │
+                                          ▼
+                                      ABANDONED
+
+PENDING:    enrollment exists, student has not yet triggered generation
+GENERATING: AI agent call in progress — lesson streaming to client
+ACTIVE:     lesson delivered, student reading — assessment not yet started
+ASSESSING:  student answering questions
+COMPLETE:   all questions answered, history record written
+ABANDONED:  student closed browser during ASSESSING — resumable within 24h
+
+There is no FAILED state. A failed generation deletes the session row
+entirely (SESS-03) — no trace is persisted and no status records it.
+A GENERATING row that is never finished (e.g. a worker restart) is a
+stale row, swept by the cleanup task in SESS-06.</span></pre>
+  </div>
+  <div class="callout cc" style="margin-top:20px;"><strong>Single Active Session Rule</strong>A student may have at most one session per enrollment that is not COMPLETE. Attempting to start a new session while one is GENERATING, ACTIVE, or ASSESSING returns the existing session. This prevents duplicate generation calls and duplicate history entries.</div>
+  <table class="rtable" style="margin-top:20px;">
+    <thead><tr><th style="width:100px">Req ID</th><th>Requirement</th><th style="width:90px">Priority</th></tr></thead>
+    <tbody>
+      <tr><td class="req-id">SESS-01</td><td>When a student triggers a new session, the orchestrator checks for an existing non-complete session. If found, it resumes it. If not found, it creates a new PENDING session and begins the generation sequence.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">SESS-02</td><td>The generation sequence is: (1) create session record with status=GENERATING, (2) call Context Assembly module, (3) initiate AI Agent call with streaming, (4) concurrently dispatch assessment generation as asyncio.create_task(), (5) on lesson stream complete, set status=ACTIVE, (6) store lesson + assessment.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">SESS-03</td><td>If the AI lesson generation call fails, the session row is deleted entirely — there is no FAILED status and no persisted trace. The student sees an error and is returned to the course home; their session count does not increment. Failure is logged with full context.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">SESS-04</td><td>The session transitions to ASSESSING when the student begins the assessment (first question fetch or first answer submitted). A session in ASSESSING whose browser is closed becomes ABANDONED and is resumable: on next login the student sees the lesson again with their already-answered questions preserved, and unanswered questions continue from where they left off.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">SESS-05</td><td>When all assessment questions are answered, the orchestrator: writes the session history record, sets session status=COMPLETE, and updates the enrollment's last_session_at timestamp. This is a single atomic database operation.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">SESS-06</td><td>A scheduled cleanup task (Django management command + Railway cron) runs daily and sweeps two stale states: (a) ABANDONED sessions older than 24 hours are written as COMPLETE with assessment_outcome='not_taken' for unanswered questions; (b) GENERATING sessions older than 1 hour — orphaned by a worker restart mid-stream — are deleted, consistent with SESS-03. The supporting index covers both statuses.</td><td><span class="pri ps">SHOULD</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- S11: CONTEXT ASSEMBLY -->
+<div class="section" id="s11">
+  <div class="section-header"><span class="sec-num">11</span><h2 class="sec-title">Module 6 — Context Assembly</h2></div>
+  <p>The context assembly module builds the structured object that becomes the AI agent's prompt. It reads from two sources: the course brief (M3) and the enrollment's session history. The quality of its output is the most controllable determinant of lesson quality.</p>
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">11.1</span><span class="sub-title">Context Object Structure</span></div>
+    <div class="codeblock">
+      <div class="cb-label">Context Object — Assembled per Session</div>
+      <pre>
+{
+  <span class="c-str">"course_brief"</span>: {
+    <span class="c-comment">// All fields from the course brief verbatim. Never truncated.</span>
+    <span class="c-str">"title"</span>: <span class="c-str">"Biology — Year 10"</span>,
+    <span class="c-str">"subject"</span>: <span class="c-str">"Biology"</span>,
+    <span class="c-str">"target_level"</span>: <span class="c-str">"Year 10 / Age 14-15"</span>,
+    <span class="c-str">"learning_outcomes"</span>: <span class="c-str">"..."</span>,
+    <span class="c-str">"topic_sequence"</span>: <span class="c-str">"..."</span>,
+    <span class="c-str">"exam_context"</span>: <span class="c-str">"..."</span>,
+    <span class="c-str">"special_instructions"</span>: <span class="c-str">"..."</span>,
+    <span class="c-str">"approximate_lessons"</span>: 40
+  },
+  <span class="c-str">"student"</span>: {
+    <span class="c-str">"name"</span>: <span class="c-str">"Amara"</span>         <span class="c-comment">// First name only</span>
+  },
+  <span class="c-str">"session_count"</span>: 7,  <span class="c-comment">// Total completed sessions for this enrollment</span>
+  <span class="c-str">"history"</span>: {
+    <span class="c-str">"recent"</span>: [          <span class="c-comment">// Last 5 sessions — full detail</span>
+      {
+        <span class="c-str">"session_number"</span>: 7,
+        <span class="c-str">"lesson_title"</span>: <span class="c-str">"Mitosis — Stages and Cell Division"</span>,
+        <span class="c-str">"key_concepts"</span>: [<span class="c-str">"prophase"</span>, <span class="c-str">"metaphase"</span>, <span class="c-str">"anaphase"</span>, <span class="c-str">"telophase"</span>],
+        <span class="c-str">"assessment_outcome"</span>: <span class="c-str">"needs_reinforcement"</span>,
+        <span class="c-str">"concepts_missed"</span>: [<span class="c-str">"anaphase"</span>]
+      }
+      <span class="c-comment">// ... sessions 3–6</span>
+    ],
+    <span class="c-str">"earlier"</span>: [         <span class="c-comment">// Sessions 1–2 — compressed</span>
+      { <span class="c-str">"session_number"</span>: 2, <span class="c-str">"lesson_title"</span>: <span class="c-str">"Cell Structure"</span>, <span class="c-str">"assessment_outcome"</span>: <span class="c-str">"strong"</span> },
+      { <span class="c-str">"session_number"</span>: 1, <span class="c-str">"lesson_title"</span>: <span class="c-str">"Introduction to Cell Biology"</span>, <span class="c-str">"assessment_outcome"</span>: <span class="c-str">"adequate"</span> }
+    ]
+  }
+}</pre>
+    </div>
+  </div>
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">11.2</span><span class="sub-title">Summarisation Strategy</span></div>
+    <p>As session count grows, raw history will exceed model context limits. The summarisation rule is applied during context assembly, before any AI call is made.</p>
+    <table class="rtable">
+      <thead><tr><th>Session Range</th><th>Detail Level</th><th>Fields Included</th></tr></thead>
+      <tbody>
+        <tr><td>Last 5 sessions</td><td>Full</td><td>session_number, lesson_title, key_concepts, assessment_outcome, concepts_missed</td></tr>
+        <tr><td>Sessions 6–20 ago</td><td>Compressed</td><td>session_number, lesson_title, assessment_outcome only</td></tr>
+        <tr><td>Sessions older than 20</td><td>Title only</td><td>session_number, lesson_title only — breadcrumb for topic coverage</td></tr>
+      </tbody>
+    </table>
+    <div class="callout cw" style="margin-top:16px;"><strong>Build This First</strong>The summarisation utility must be written and tested before the AI integration, not after. It is a pure Python function with no external dependencies. Its output directly determines how well the agent adapts over time. Deferring it to post-MVP means the first real test sessions have no meaningful adaptation.</div>
+  </div>
+</div>
+
+<!-- S12: AI AGENT -->
+<div class="section" id="s12">
+  <div class="section-header"><span class="sec-num">12</span><h2 class="sec-title">Module 7 — AI Agent</h2></div>
+  <p class="lead">The AI Agent module makes two sequential Anthropic API calls per session: one for lesson generation (streaming) and one for assessment generation (non-streaming, concurrent). Prompt engineering is first-class engineering work in this module — the prompts are versioned, tested, and tunable without code changes.</p>
+
+  <div class="subsection" id="s12-1">
+    <div class="sub-header"><span class="sub-num">12.1</span><span class="sub-title">Lesson Generation — Prompt &amp; Output</span></div>
+    <div class="prompt-spec">
+      <div class="ps-label">Lesson Generation System Prompt Template</div>
+      <pre>
+<span class="c-inst">You are an expert educational content designer creating lessons for {target_level} students.
+Your task is to generate the next lesson in an ongoing course for one specific student.
+You have access to everything they have already been taught and how well they understood it.
+
+COURSE BRIEF
+━━━━━━━━━━━━
+Subject:              {course.subject}
+Level:                {course.target_level}
+Learning Outcomes:    {course.learning_outcomes}
+Topic Sequence:       {course.topic_sequence}
+Exam Context:         {course.exam_context | "Not provided"}
+Special Instructions: {course.special_instructions | "None"}
+Target Lessons:       Approx. {course.approximate_lessons} total
+
+STUDENT HISTORY
+━━━━━━━━━━━━━━━
+Student:              {student.name}
+Sessions completed:   {session_count}
+{formatted_history_block}
+
+STEP 1 — PLAN (required before writing):
+Wrap your reasoning in &lt;plan&gt;&lt;/plan&gt; tags. Reason through:
+- What topics have been covered? What remains in the sequence?
+- Are there concepts marked needs_reinforcement to revisit?
+- What is the right depth and scope for session {session_count + 1}?
+- What teaching approach fits this student's performance pattern?
+- Should this lesson include an interactive visual? If so, what type and why?
+Do not skip this step. The plan is not shown to the student.
+
+STEP 2 — LESSON BLOCKS (delivered to student):
+Return a JSON array of blocks inside &lt;blocks&gt;&lt;/blocks&gt; tags.
+Each block is one of:
+
+{ "type": "text", "content": "markdown string" }
+{ "type": "interactive", "description": "label shown above iframe", "height": 380,
+  "html": "complete self-contained HTML document as a string" }
+{ "type": "callout", "variant": "definition|note|example|warning", "content": "markdown" }
+
+Rules for text blocks:
+- Use markdown: ## headings, **bold**, bullet lists, numbered lists
+- 400–700 words total across all text blocks. Do not pad.
+- Age-appropriate vocabulary for {target_level}
+- Do not repeat content from prior sessions at the same depth
+
+Rules for interactive blocks:
+- Only include if it genuinely aids understanding of a process, system, or concept
+- HTML must be fully self-contained (inline CSS and JS)
+- Libraries allowed only from: cdn.jsdelivr.net, unpkg.com (specific list below)
+- No fetch(), no localStorage, no external API calls, no form submissions
+- Must work at 100% container width
+- Include clear labels explaining what the visual shows
+
+STEP 3 — METADATA:
+Return inside &lt;meta&gt;&lt;/meta&gt; tags — valid JSON only:
+{
+  "lesson_title": "string — specific and descriptive",
+  "key_concepts": ["3 to 5 concept strings"],
+  "estimated_read_minutes": integer,
+  "has_interactive": boolean
+}</span></pre>
+    </div>
+    <div class="callout cs" style="margin-top:16px;"><strong>Allowed CDN Libraries for Interactive Blocks</strong>p5.js (cdn.jsdelivr.net/npm/p5), Chart.js (cdn.jsdelivr.net/npm/chart.js), D3.js (cdn.jsdelivr.net/npm/d3), Three.js (cdn.jsdelivr.net/npm/three), Mermaid.js (cdn.jsdelivr.net/npm/mermaid). Desmos is embedded via their official API script tag. Any library not on this list must be rejected server-side before the lesson is stored.</div>
+  </div>
+
+  <div class="subsection" id="s12-2">
+    <div class="sub-header"><span class="sub-num">12.2</span><span class="sub-title">Assessment Generation</span></div>
+    <div class="prompt-spec">
+      <div class="ps-label">Assessment Generation System Prompt Template</div>
+      <pre>
+<span class="c-inst">You are generating a multiple choice assessment for a student lesson.
+The responses will be used to adapt future lessons — not to grade the student.
+
+Lesson Title:  {lesson.title}
+Key Concepts:  {lesson.key_concepts as comma-separated list}
+Lesson Body:   {lesson.text_blocks_only}  // interactive HTML is stripped
+
+Generate exactly 4 MCQ questions following these rules:
+- Test understanding and application, not memorisation of exact wording
+- Each question maps to exactly one key concept
+- Cover at least 3 distinct key concepts across 4 questions
+- 4 answer options per question (A B C D), exactly one correct
+- Wrong options must be plausible — misconceptions that real students hold
+- No trick questions, no double negatives, no ambiguous phrasing
+- Appropriate difficulty for {target_level}
+
+Return ONLY valid JSON, no preamble, no markdown fences:
+[
+  {
+    "question_text": "string",
+    "concept_tag": "string — must match one of the key_concepts exactly",
+    "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},
+                {"id":"C","text":"..."},{"id":"D","text":"..."}],
+    "correct_option_id": "A|B|C|D",
+    "correct_explanation": "string — why this is correct",
+    "wrong_explanations": {
+      "B": "string — the common misconception this option represents",
+      "C": "string",
+      "D": "string"
+    }
+  }
+]</span></pre>
+    </div>
+  </div>
+
+  <div class="subsection" id="s12-3">
+    <div class="sub-header"><span class="sub-num">12.3</span><span class="sub-title">Streaming Implementation</span></div>
+    <div class="codeblock">
+      <div class="cb-label">Django async view — incremental parse, streams clean text only</div>
+      <pre>
+<span class="c-kw">from</span> django.http <span class="c-kw">import</span> StreamingHttpResponse
+<span class="c-kw">import</span> asyncio, json
+
+<span class="c-kw">async def</span> <span class="c-entity">generate_session</span>(request, enrollment_id):
+    enrollment = <span class="c-kw">await</span> get_enrollment_or_404(enrollment_id, request.user)
+    session = <span class="c-kw">await</span> create_or_resume_session(enrollment)
+    context = <span class="c-kw">await</span> assemble_context(enrollment)
+
+    <span class="c-comment"># Assessment task is created now but blocks until the lesson body</span>
+    <span class="c-comment"># is finalised — it overlaps the student's READING time, not generation.</span>
+    assessment_task = asyncio.create_task(
+        generate_assessment_when_ready(session)
+    )
+
+    <span class="c-kw">async def</span> <span class="c-entity">event_stream</span>():
+        <span class="c-comment"># The agent emits tagged output: &lt;plan&gt;...&lt;/plan&gt; then a JSON</span>
+        <span class="c-comment"># &lt;blocks&gt; array then &lt;meta&gt;. The raw stream is NOT renderable.</span>
+        <span class="c-comment"># An incremental parser consumes the raw token stream and emits</span>
+        <span class="c-comment"># ONLY clean text-block content outward — plan and JSON syntax</span>
+        <span class="c-comment"># are suppressed and never reach the client.</span>
+        parser = IncrementalLessonParser()
+        full_raw = <span class="c-str">""</span>
+        <span class="c-kw">async with</span> anthropic_client.messages.stream(
+            model=settings.ANTHROPIC_MODEL_VERSION,
+            system=build_lesson_prompt(context),
+            messages=[{<span class="c-str">"role"</span>: <span class="c-str">"user"</span>, <span class="c-str">"content"</span>: <span class="c-str">"Generate the next lesson."</span>}],
+            max_tokens=<span class="c-str">8000</span>   <span class="c-comment"># budget: plan + text + one ≤15k-char block + meta</span>
+        ) <span class="c-kw">as</span> stream:
+            <span class="c-kw">async for</span> raw <span class="c-kw">in</span> stream.text_stream:
+                full_raw += raw
+                <span class="c-comment"># parser yields clean markdown only when inside a text block;</span>
+                <span class="c-comment"># returns nothing while inside &lt;plan&gt; or JSON scaffolding.</span>
+                <span class="c-kw">for</span> clean <span class="c-kw">in</span> parser.feed(raw):
+                    <span class="c-kw">yield</span> sse(<span class="c-str">"token"</span>, {<span class="c-str">"text"</span>: clean})
+                <span class="c-kw">if</span> parser.meta_ready <span class="c-kw">and not</span> parser.meta_sent:
+                    <span class="c-kw">yield</span> sse(<span class="c-str">"lesson_meta"</span>, parser.meta)
+
+        <span class="c-comment"># Stream done — parse the full raw output into the block array</span>
+        lesson = parse_lesson_output(full_raw)        <span class="c-comment"># AGENT-04</span>
+        <span class="c-kw">await</span> store_lesson(session, lesson)
+        <span class="c-kw">await</span> set_session_status(session, <span class="c-str">'ACTIVE'</span>)
+        <span class="c-kw">yield</span> sse(<span class="c-str">"lesson_complete"</span>, {<span class="c-str">"session_id"</span>: str(session.id)})
+
+        <span class="c-kw">await</span> assessment_task
+        <span class="c-kw">yield</span> sse(<span class="c-str">"assessment_ready"</span>, {<span class="c-str">"session_id"</span>: str(session.id)})
+        <span class="c-kw">yield</span> sse(<span class="c-str">"done"</span>, {})
+
+    <span class="c-kw">return</span> StreamingHttpResponse(
+        event_stream(),
+        content_type=<span class="c-str">'text/event-stream'</span>,
+        headers={<span class="c-str">'Cache-Control'</span>: <span class="c-str">'no-cache'</span>, <span class="c-str">'X-Accel-Buffering'</span>: <span class="c-str">'no'</span>}
+    )</pre>
+    </div>
+    <div class="callout cp" style="margin-top:16px;"><strong>The Streaming Model — Read This</strong>The agent's raw output is tagged JSON: a <code>&lt;plan&gt;</code> reasoning block, a JSON <code>&lt;blocks&gt;</code> array, and a <code>&lt;meta&gt;</code> block. This raw form is not renderable and the plan must never reach a student. The server runs an incremental parser over the token stream and emits outward only the clean markdown found inside text blocks — the plan and all JSON scaffolding are suppressed. Interactive blocks are large embedded HTML strings; they do not stream as live tokens. Instead, after <code>lesson_complete</code>, the client fetches the fully parsed block array and renders interactive blocks in place. The live "building" effect therefore applies to text only; interactive blocks appear on completion. This is the single streaming model — REND-04 and AC-03 describe exactly this and nothing more.</div>
+    <div class="callout cn" style="margin-top:16px;"><strong>X-Accel-Buffering: no</strong>Railway's proxy buffers responses by default. Without this header the stream is held and delivered all at once. It must be set on every streaming endpoint.</div>
+  </div>
+
+  <table class="rtable" style="margin-top:20px;">
+    <thead><tr><th style="width:100px">Req ID</th><th>Requirement</th><th style="width:90px">Priority</th></tr></thead>
+    <tbody>
+      <tr><td class="req-id">AGENT-01</td><td>Lesson generation and assessment generation are separate API calls. Never combined. The lesson call streams; the assessment call does not.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AGENT-02</td><td>Assessment generation is dispatched as asyncio.create_task() when lesson streaming begins. The task blocks until the lesson body is finalised, then generates — so it overlaps the student's reading time. It is ready by the time the student finishes the lesson.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AGENT-03</td><td>The model version is read from the ANTHROPIC_MODEL_VERSION environment variable. Never hardcoded. Changing the model requires only an environment variable update.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AGENT-04</td><td>The full prompt context, raw agent response, and parsed output are stored against the session before the lesson is delivered. If storage fails, the lesson is not delivered.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AGENT-05</td><td>Interactive block HTML is validated server-side before storage: must be a complete HTML document, must not contain fetch() or XMLHttpRequest calls to non-whitelisted domains, and must not exceed 15,000 characters. This ceiling is set deliberately against the AGENT-09 token budget so a lesson with one interactive block cannot exceed max_tokens. A block failing validation is dropped and replaced in the block array with a plain text fallback block; the lesson is delivered with all other blocks intact.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AGENT-06</td><td>The assessment JSON response is validated against the expected schema. A malformed response triggers exactly one retry of the assessment generation call. Only on a second consecutive failure is the lesson delivered with no assessment (the session's assessment_outcome is recorded as 'not_taken'). The retry is mandatory — it must appear in the implementation.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AGENT-07</td><td>A single lesson generation call must complete within AGENT_TIMEOUT_SECONDS (default 30). The call is wrapped in an enforced timeout. If exceeded, it is treated identically to an API failure: the session row is deleted (SESS-03) and an error is surfaced to the student. A loading state is shown during generation.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AGENT-08</td><td>Lesson generation is idempotent with respect to retries. A failed generation leaves no partial lesson, no partial assessment, and no session row. A student re-attempting after a failure starts a completely fresh session — there is no half-written state to recover or collide with.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">AGENT-09</td><td>The lesson generation call uses an explicit, documented token budget. max_tokens is set to 8,000, sized to cover: the &lt;plan&gt; reasoning block, 400–700 words of lesson text, one interactive block at the AGENT-05 ceiling of 15,000 characters (~4,000–5,000 tokens), and the &lt;meta&gt; block, with margin. The AGENT-05 character ceiling and this token budget are a single coordinated decision — neither may be changed without re-checking the other.</td><td><span class="pri pm">MUST</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- S13: RENDERING ENGINE -->
+<div class="section" id="s13">
+  <div class="section-header"><span class="sec-num">13</span><h2 class="sec-title">Module 8 — Rendering Engine</h2></div>
+  <p class="lead">The Rendering Engine is a client-side module — it lives entirely in Next.js and has no Django dependency. It receives a structured lesson JSON object and routes each block to one of three sub-renderers. The student sees one cohesive lesson. They never know they are seeing three different rendering systems.</p>
+  <p>This module is the part of Paideia that most directly shapes the student's experience. It is the difference between "an AI generated me some text" and "I just had a genuinely interactive learning experience." The interactive renderer in particular is what elevates Paideia beyond a chatbot wrapper.</p>
+  <div class="callout cp"><strong>The Claude Model</strong>This rendering architecture is directly modelled on how Claude renders interactive artifacts in this interface. Claude generates a self-contained HTML string. That string is injected into a sandboxed iframe via srcDoc. The iframe runs in a completely isolated environment with no access to the parent page. The content just works. Paideia uses this exact mechanism — extended with a block-routing system for multi-part lessons.</div>
+
+  <div class="subsection" id="s13-1">
+    <div class="sub-header"><span class="sub-num">13.1</span><span class="sub-title">Rendering Engine Architecture</span></div>
+    <div class="renderer-stack">
+      <div class="renderer-card">
+        <div class="rc-num">01</div>
+        <div class="rc-name">Text Renderer</div>
+        <div class="rc-subtitle">TYPE: "text" · TYPE: "callout"</div>
+        <div class="rc-desc">Receives markdown strings. Renders via react-markdown with a plugin chain: remark-math + rehype-katex for equations, rehype-highlight for code, remark-gfm for tables and task lists. Callout blocks render as styled containers (definition, note, example, warning variants).</div>
+      </div>
+      <div class="renderer-card">
+        <div class="rc-num">02</div>
+        <div class="rc-name">Interactive Renderer</div>
+        <div class="rc-subtitle">TYPE: "interactive"</div>
+        <div class="rc-desc">Receives a self-contained HTML string. Injects it into a sandboxed iframe via srcDoc. The sandbox attribute isolates execution completely. The student can interact with the visual — manipulate parameters, see animations, explore data — without any risk to the parent page or other students' data.</div>
+      </div>
+      <div class="renderer-card">
+        <div class="rc-num">03</div>
+        <div class="rc-name">Assessment Engine</div>
+        <div class="rc-subtitle">Post-lesson state machine</div>
+        <div class="rc-desc">A pure React state machine. Not a renderer of AI output — a structured UI component. Displays questions one at a time, captures answers, shows immediate feedback per question, and produces the session summary. The most interaction-dense part of the interface.</div>
+      </div>
+    </div>
+    <div class="codeblock" style="margin-top:20px;">
+      <div class="cb-label">LessonRenderer.tsx — Block Router</div>
+      <pre>
+<span class="c-kw">export function</span> <span class="c-entity">LessonRenderer</span>({ blocks }: { blocks: LessonBlock[] }) {
+  <span class="c-kw">return</span> (
+    &lt;div className=<span class="c-str">"lesson-body"</span>&gt;
+      {blocks.map((block, i) =&gt; {
+        <span class="c-kw">switch</span> (block.type) {
+          <span class="c-kw">case</span> <span class="c-str">'text'</span>:
+            <span class="c-kw">return</span> &lt;<span class="c-entity">TextBlock</span> key={i} content={block.content} /&gt;
+          <span class="c-kw">case</span> <span class="c-str">'interactive'</span>:
+            <span class="c-kw">return</span> &lt;<span class="c-entity">InteractiveBlock</span> key={i} block={block} /&gt;
+          <span class="c-kw">case</span> <span class="c-str">'callout'</span>:
+            <span class="c-kw">return</span> &lt;<span class="c-entity">CalloutBlock</span> key={i} variant={block.variant} content={block.content} /&gt;
+          <span class="c-kw">default</span>:
+            <span class="c-kw">return null</span>  <span class="c-comment">// Unknown block types are silently skipped</span>
+        }
+      })}
+    &lt;/div&gt;
+  )
+}</pre>
+    </div>
+  </div>
+
+  <div class="subsection" id="s13-2">
+    <div class="sub-header"><span class="sub-num">13.2</span><span class="sub-title">Block Schema</span></div>
+    <p>Lessons are structured arrays of typed blocks. This schema is the contract between the AI Agent (producer) and the Rendering Engine (consumer). Both sides must agree on it exactly.</p>
+    <div class="codeblock">
+      <div class="cb-label">TypeScript — Lesson Block Types</div>
+      <pre>
+<span class="c-kw">type</span> <span class="c-entity">TextBlock</span> = {
+  type: <span class="c-str">'text'</span>
+  content: string  <span class="c-comment">// Markdown string</span>
+}
+
+<span class="c-kw">type</span> <span class="c-entity">InteractiveBlock</span> = {
+  type: <span class="c-str">'interactive'</span>
+  description: string  <span class="c-comment">// Label shown above the iframe, e.g. "Concentration gradient simulation"</span>
+  height: number       <span class="c-comment">// Pixel height. Agent sets this based on content complexity.</span>
+  html: string         <span class="c-comment">// Complete self-contained HTML document as a string</span>
+}
+
+<span class="c-kw">type</span> <span class="c-entity">CalloutBlock</span> = {
+  type: <span class="c-str">'callout'</span>
+  variant: <span class="c-str">'definition'</span> | <span class="c-str">'note'</span> | <span class="c-str">'example'</span> | <span class="c-str">'warning'</span>
+  content: string  <span class="c-comment">// Markdown string</span>
+}
+
+<span class="c-kw">type</span> <span class="c-entity">LessonBlock</span> = TextBlock | InteractiveBlock | CalloutBlock
+
+<span class="c-kw">type</span> <span class="c-entity">Lesson</span> = {
+  lesson_title: string
+  key_concepts: string[]        <span class="c-comment">// 3–5 concepts</span>
+  estimated_read_minutes: number
+  has_interactive: boolean
+  blocks: LessonBlock[]
+}</pre>
+    </div>
+  </div>
+
+  <div class="subsection" id="s13-3">
+    <div class="sub-header"><span class="sub-num">13.3</span><span class="sub-title">Renderer 1 — Text &amp; Callout</span></div>
+    <div class="codeblock">
+      <div class="cb-label">TextBlock.tsx — react-markdown with plugin chain</div>
+      <pre>
+<span class="c-kw">import</span> ReactMarkdown <span class="c-kw">from</span> <span class="c-str">'react-markdown'</span>
+<span class="c-kw">import</span> remarkMath <span class="c-kw">from</span> <span class="c-str">'remark-math'</span>
+<span class="c-kw">import</span> rehypeKatex <span class="c-kw">from</span> <span class="c-str">'rehype-katex'</span>
+<span class="c-kw">import</span> rehypeHighlight <span class="c-kw">from</span> <span class="c-str">'rehype-highlight'</span>
+<span class="c-kw">import</span> remarkGfm <span class="c-kw">from</span> <span class="c-str">'remark-gfm'</span>
+<span class="c-kw">import</span> <span class="c-str">'katex/dist/katex.min.css'</span>
+
+<span class="c-kw">export function</span> <span class="c-entity">TextBlock</span>({ content }: { content: string }) {
+  <span class="c-kw">return</span> (
+    &lt;div className=<span class="c-str">"lesson-text-block"</span>&gt;
+      &lt;<span class="c-entity">ReactMarkdown</span>
+        remarkPlugins={[remarkMath, remarkGfm]}
+        rehypePlugins={[rehypeKatex, rehypeHighlight]}
+      &gt;
+        {content}
+      &lt;/ReactMarkdown&gt;
+    &lt;/div&gt;
+  )
+}
+
+<span class="c-comment">// Callout variants map to styled containers:
+// 'definition' → blue left border, Definition label
+// 'note'       → amber left border, Note label  
+// 'example'    → green left border, Worked Example label
+// 'warning'    → red left border, Important label</span></pre>
+    </div>
+  </div>
+
+  <div class="subsection" id="s13-4">
+    <div class="sub-header"><span class="sub-num">13.4</span><span class="sub-title">Renderer 2 — Interactive Sandbox</span></div>
+    <p>The HTML string from the AI agent is injected into a sandboxed iframe via srcDoc. The iframe is completely isolated from the parent application. Because the sandbox isolates the iframe, the parent cannot observe failures inside it directly — so failure detection uses a postMessage handshake, not the iframe's onError event.</p>
+    <div class="callout cw"><strong>Why Not onError</strong>A srcDoc iframe has no network resource to load, so its onError event does not fire for the realistic failure mode — broken generated JavaScript. JS errors inside a sandbox do not propagate to the parent. Relying on onError would leave a malfunctioning interactive showing as a broken visual with no fallback. The handshake below is the correct mechanism.</div>
+    <div class="codeblock">
+      <div class="cb-label">InteractiveBlock.tsx — sandboxed iframe with handshake</div>
+      <pre>
+<span class="c-kw">export function</span> <span class="c-entity">InteractiveBlock</span>({ block }: { block: InteractiveBlock }) {
+  <span class="c-kw">const</span> [state, setState] = useState&lt;<span class="c-str">'loading'</span>|<span class="c-str">'ready'</span>|<span class="c-str">'failed'</span>&gt;(<span class="c-str">'loading'</span>)
+  <span class="c-kw">const</span> frameRef = useRef&lt;HTMLIFrameElement&gt;(<span class="c-kw">null</span>)
+
+  useEffect(() =&gt; {
+    <span class="c-comment">// The server injects a small bootstrap into every interactive</span>
+    <span class="c-comment">// HTML string during validation: on successful init it calls</span>
+    <span class="c-comment">// parent.postMessage({type:'paideia:ready', id}, '*').</span>
+    <span class="c-kw">const</span> onMsg = (e: MessageEvent) =&gt; {
+      <span class="c-kw">if</span> (e.source === frameRef.current?.contentWindow
+          &amp;&amp; e.data?.type === <span class="c-str">'paideia:ready'</span>) setState(<span class="c-str">'ready'</span>)
+    }
+    window.addEventListener(<span class="c-str">'message'</span>, onMsg)
+    <span class="c-comment">// No handshake within 4s → treat the block as failed.</span>
+    <span class="c-kw">const</span> timer = setTimeout(() =&gt; {
+      setState(s =&gt; s === <span class="c-str">'loading'</span> ? <span class="c-str">'failed'</span> : s)
+    }, <span class="c-str">4000</span>)
+    <span class="c-kw">return</span> () =&gt; { window.removeEventListener(<span class="c-str">'message'</span>, onMsg); clearTimeout(timer) }
+  }, [])
+
+  <span class="c-kw">if</span> (state === <span class="c-str">'failed'</span>) {
+    <span class="c-comment">// Graceful degradation — lesson continues without the visual</span>
+    <span class="c-kw">return</span> &lt;div className=<span class="c-str">"interactive-fallback"</span>&gt;
+             &lt;p&gt;Interactive visual unavailable for this lesson.&lt;/p&gt;
+           &lt;/div&gt;
+  }
+
+  <span class="c-kw">return</span> (
+    &lt;div className=<span class="c-str">"interactive-container"</span>&gt;
+      &lt;div className=<span class="c-str">"interactive-label"</span>&gt;{block.description}&lt;/div&gt;
+      &lt;iframe
+        ref={frameRef}
+        srcDoc={block.html}
+        sandbox=<span class="c-str">"allow-scripts"</span>
+        <span class="c-comment">// allow-scripts: JS runs inside the iframe.
+        // No allow-same-origin: cannot reach the parent window.
+        // No allow-forms / allow-top-navigation.</span>
+        style={{ width: <span class="c-str">'100%'</span>, height: `${block.height}px`, border: <span class="c-str">'none'</span> }}
+        title={block.description}
+      /&gt;
+    &lt;/div&gt;
+  )
+}</pre>
+    </div>
+    <div class="callout ct" style="margin-top:16px;"><strong>Why sandbox="allow-scripts" Only</strong>The omission of allow-same-origin is the critical security attribute. With it, injected content could reach the parent window's cookies and DOM. Without it the iframe is sealed — generated JavaScript has no path to the parent application or to any other student's data. The failure handshake operates over postMessage, which the sandbox permits while still blocking same-origin access.</div>
+  </div>
+
+  <div class="subsection" id="s13-5">
+    <div class="sub-header"><span class="sub-num">13.5</span><span class="sub-title">Renderer 3 — Assessment State Machine</span></div>
+    <div class="codeblock">
+      <div class="cb-label">Assessment state machine — states and transitions</div>
+      <pre>
+<span class="c-comment">States:
+  IDLE         → waiting, "Start Assessment" button visible
+  ANSWERING    → question N of 4 displayed, options shown
+  REVEALED     → answer confirmed, correct/wrong shown with explanation
+  COMPLETE     → all 4 answered, session summary displayed
+
+Transitions:
+  IDLE       → ANSWERING:  student clicks "Start Assessment"
+  ANSWERING  → REVEALED:   student selects an option and clicks "Confirm"
+  REVEALED   → ANSWERING:  student clicks "Next Question" (if questions remain)
+  REVEALED   → COMPLETE:   student clicks "Finish" (on last question)
+
+Constraints:
+  - Student cannot go back to change a confirmed answer
+  - Student cannot skip questions
+  - Correct answer is never shown before student confirms
+  - All answer events are posted to the API immediately on confirmation
+    (not batched at end) — prevents data loss if browser closes</span></pre>
+    </div>
+  </div>
+
+  <div class="subsection" id="s13-6">
+    <div class="sub-header"><span class="sub-num">13.6</span><span class="sub-title">Security Layer</span></div>
+    <table class="rtable">
+      <thead><tr><th>Layer</th><th>Mechanism</th><th>What it prevents</th></tr></thead>
+      <tbody>
+        <tr><td><strong>iframe sandbox</strong></td><td>sandbox="allow-scripts" only — no allow-same-origin</td><td>Generated JS cannot access parent window, cookies, localStorage, or other students' data</td></tr>
+        <tr><td><strong>CSP via injected meta tag</strong></td><td>During server-side validation, a <code>&lt;meta http-equiv="Content-Security-Policy"&gt;</code> tag restricting script-src to the CDN whitelist is injected into the interactive HTML before storage</td><td>Generated code cannot load scripts from arbitrary external sources. Uses a real, browser-supported CSP mechanism — not the non-standard iframe csp attribute.</td></tr>
+        <tr><td><strong>Server-side HTML validation</strong></td><td>Django validates interactive block HTML before storage</td><td>Catches malformed output, oversized blocks, and attempted calls to non-whitelisted domains before the lesson is stored</td></tr>
+        <tr><td><strong>No allow-same-origin</strong></td><td>Deliberate iframe attribute omission</td><td>Even if generated JS attempts document.cookie or window.parent.document, it throws a security error — no access possible</td></tr>
+        <tr><td><strong>Max block size</strong></td><td>15,000 character limit enforced server-side (coordinated with the AGENT-09 token budget)</td><td>Prevents oversized HTML blocks and guarantees a lesson with one interactive block fits within max_tokens</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection" id="s13-7">
+    <div class="sub-header"><span class="sub-num">13.7</span><span class="sub-title">Library Whitelist &amp; Subject Mapping</span></div>
+    <p>The AI agent is only permitted to load libraries from the following CDN whitelist. This list is included verbatim in the generation system prompt and enforced server-side during HTML validation.</p>
+    <div class="lib-grid">
+      <div class="lib-card"><div class="lib-name">p5.js</div><div class="lib-use">Animations, simulations, particle systems, canvas drawing</div><div class="lib-subject">Biology, Physics, Chemistry</div></div>
+      <div class="lib-card"><div class="lib-name">Chart.js</div><div class="lib-use">Bar charts, line charts, scatter plots, histograms</div><div class="lib-subject">Mathematics, Geography, Statistics</div></div>
+      <div class="lib-card"><div class="lib-name">D3.js</div><div class="lib-use">Data visualisations, SVG diagrams, force graphs</div><div class="lib-subject">Biology diagrams, Geography, Data Science</div></div>
+      <div class="lib-card"><div class="lib-name">Three.js</div><div class="lib-use">3D models, molecular structures, geometric solids</div><div class="lib-subject">Chemistry, Mathematics, Physics</div></div>
+      <div class="lib-card"><div class="lib-name">Mermaid.js</div><div class="lib-use">Flowcharts, sequence diagrams, process maps</div><div class="lib-subject">Computer Science, Biology (cycles)</div></div>
+      <div class="lib-card"><div class="lib-name">Desmos API</div><div class="lib-use">Interactive graphing calculator, function plotting</div><div class="lib-subject">Mathematics, Physics (graphs)</div></div>
+    </div>
+    <div class="callout cw" style="margin-top:16px;"><strong>Adding Libraries</strong>New libraries must be added in three coordinated places: the system prompt whitelist, the server-side validation allowlist, and the script-src directive of the injected CSP meta tag. Updating one without the others creates drift — the agent generates valid code the validator rejects, or the CSP blocks an approved library. Whitelist changes are treated as a prompt version change and tested against representative course briefs.</div>
+  </div>
+
+  <table class="rtable" style="margin-top:20px;">
+    <thead><tr><th style="width:100px">Req ID</th><th>Requirement</th><th style="width:90px">Priority</th></tr></thead>
+    <tbody>
+      <tr><td class="req-id">REND-01</td><td>The LessonRenderer iterates blocks in order. Unknown block types are silently skipped without throwing an error. Lesson delivery must be resilient to unexpected block types from future prompt versions.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">REND-02</td><td>Interactive block failure is detected via a postMessage handshake, not the iframe onError event (which does not fire for srcDoc content). The generated HTML posts a 'paideia:ready' message on successful initialisation; if the parent receives no handshake within 4 seconds, the block is replaced with a plain text fallback. The rest of the lesson renders normally and the failure is logged client-side.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">REND-03</td><td>The lesson header (title, estimated read time, key concepts preview) renders immediately from the lesson metadata before any blocks are rendered. Students know what they are about to learn before the content appears.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">REND-04</td><td>During lesson generation the client renders streamed text progressively — clean markdown from text blocks appears as it arrives, giving a live "building" effect (the plan and JSON scaffolding are suppressed server-side and never reach the client). Interactive blocks are large embedded HTML and do not stream as live tokens; after the lesson_complete event the client fetches the fully parsed block array and renders interactive blocks in place. The student sees text build live and interactive visuals appear on completion. This is the only streaming behaviour — no other model is implied anywhere in this document.</td><td><span class="pri ps">SHOULD</span></td></tr>
+      <tr><td class="req-id">REND-05</td><td>The "Start Assessment" button is visible and accessible at all times during lesson reading — fixed position or sticky at the bottom. Students can proceed to assessment without finishing the lesson. This is their choice and is not penalised.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">REND-06</td><td>The assessment state machine posts each answer to the API immediately on confirmation. Answers are never batched. A student who closes their browser after answering 2 of 4 questions has those 2 answers preserved on reconnect.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">REND-07</td><td>KaTeX CSS (for equation rendering) is loaded as a global stylesheet in the Next.js app layout. It must not be lazy-loaded — equations in the first text block of a lesson must render correctly without a flash of unstyled math.</td><td><span class="pri pm">MUST</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- S14: ASSESSMENT ENGINE -->
+<div class="section" id="s14">
+  <div class="section-header"><span class="sec-num">14</span><h2 class="sec-title">Module — Assessment Engine</h2></div>
+  <p>Assessments serve one purpose: generating a signal about student understanding that feeds the next lesson's generation context. They are not grades. They are the adaptation mechanism. MVP uses MCQ only — 4 questions per lesson, auto-evaluated, with immediate per-question feedback.</p>
+  <table class="rtable" style="margin-top:18px;">
+    <thead><tr><th style="width:100px">Req ID</th><th>Requirement</th><th style="width:90px">Priority</th></tr></thead>
+    <tbody>
+      <tr><td class="req-id">ASMT-01</td><td>Assessment is generated concurrently with lesson streaming (asyncio.create_task). It is stored before the student reaches the assessment screen. The assessment call is never made on-demand when the student clicks "Start Assessment".</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ASMT-02</td><td>Each assessment has exactly 4 MCQ questions. Each question has exactly 4 options. Exactly one correct answer. Questions test understanding and application, not memorisation of exact wording from the lesson.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ASMT-03</td><td>Each question maps to one of the lesson's key_concepts. At least 3 distinct key concepts must be covered across the 4 questions. This is validated server-side before storage.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ASMT-04</td><td>After the student confirms each answer, they immediately see: correct/incorrect indicator, which option was correct (if they got it wrong), the correct explanation, and the explanation for why their wrong answer was incorrect. This is shown before they proceed to the next question.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ASMT-05</td><td>A score of 2 or fewer correct (out of 4) flags the session as assessment_outcome='needs_reinforcement'. The concepts_missed list is populated with the key concepts for incorrectly answered questions. This data is carried forward into the Context Assembly module.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">ASMT-06</td><td>If assessment generation failed (fallback per AGENT-06), the student sees a message explaining the assessment is unavailable for this lesson and can proceed. Session is recorded as assessment_outcome='not_taken'.</td><td><span class="pri pm">MUST</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- S15: SESSION HISTORY -->
+<div class="section" id="s15">
+  <div class="section-header"><span class="sec-num">15</span><h2 class="sec-title">Session History Store</h2></div>
+  <p>The session history store is the memory of the system. Without it, the AI Agent generates blind — no adaptation, no personalisation, no course coherence across sessions. It is the most critical data in the system and must be treated accordingly.</p>
+  <div class="subsection">
+    <div class="sub-header"><span class="sub-num">15.1</span><span class="sub-title">History Entry Written Per Completed Session</span></div>
+    <div class="field-spec">
+      <div class="field-row fh"><div class="field-cell">Field</div><div class="field-cell">Type</div><div class="field-cell">Description</div></div>
+      <div class="field-row"><div class="field-cell fn">session_number</div><div class="field-cell ft">Integer</div><div class="field-cell">Sequential within enrollment. Starts at 1. Never reused.</div></div>
+      <div class="field-row"><div class="field-cell fn">lesson_title</div><div class="field-cell ft">String</div><div class="field-cell">Title of the generated lesson.</div></div>
+      <div class="field-row"><div class="field-cell fn">key_concepts_covered</div><div class="field-cell ft">String[]</div><div class="field-cell">The 3–5 key concept terms from the lesson metadata.</div></div>
+      <div class="field-row"><div class="field-cell fn">had_interactive</div><div class="field-cell ft">Boolean</div><div class="field-cell">Whether this lesson included an interactive block. Tracked for quality analysis.</div></div>
+      <div class="field-row"><div class="field-cell fn">assessment_outcome</div><div class="field-cell ft">Enum</div><div class="field-cell">"strong" (4/4), "adequate" (3/4), "needs_reinforcement" (≤2/4), "not_taken".</div></div>
+      <div class="field-row"><div class="field-cell fn">concepts_missed</div><div class="field-cell ft">String[]</div><div class="field-cell">Key concepts for which the student answered incorrectly. Empty array if strong/adequate.</div></div>
+      <div class="field-row"><div class="field-cell fn">time_on_lesson_secs</div><div class="field-cell ft">Integer</div><div class="field-cell">Time from lesson display to "Start Assessment" click. Stored but not used in MVP generation context.</div></div>
+      <div class="field-row"><div class="field-cell fn">completed_at</div><div class="field-cell ft">Timestamp</div><div class="field-cell">When the session reached COMPLETE state.</div></div>
+    </div>
+  </div>
+  <table class="rtable" style="margin-top:20px;">
+    <thead><tr><th style="width:100px">Req ID</th><th>Requirement</th><th style="width:90px">Priority</th></tr></thead>
+    <tbody>
+      <tr><td class="req-id">HIST-01</td><td>History records are immutable once written. No actor — including admins — can alter a completed session's history record.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">HIST-02</td><td>The full lesson body (all blocks including interactive HTML) is stored permanently even though it is summarised in the generation context. Available for teacher diagnostic review.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">HIST-03</td><td>The agent's reasoning plan (from the &lt;plan&gt; tags) is stored against every lesson. Not shown to any user in MVP. Available to the engineering team for generation quality review.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">HIST-04</td><td>The Context Assembly module applies the summarisation strategy (Section 11.2) before every generation call. This is a pure function that must be unit-tested independently of the AI integration.</td><td><span class="pri pm">MUST</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- S16: PROGRESS VIEW -->
+<div class="section" id="s16">
+  <div class="section-header"><span class="sec-num">16</span><h2 class="sec-title">Progress View</h2></div>
+  <p>Minimal progress visibility for MVP. Teachers need enough visibility to know whether students are using the system and to diagnose generation quality. Students need enough to stay motivated.</p>
+  <table class="rtable" style="margin-top:18px;">
+    <thead><tr><th style="width:100px">Req ID</th><th>Requirement</th><th style="width:90px">Priority</th></tr></thead>
+    <tbody>
+      <tr><td class="req-id">PROG-01</td><td>Teacher sees a progress table for each of their own courses only (courses where course.teacher_id = request.user.id). Table shows: student name, sessions completed, last session date, most recent assessment outcome. Sortable by each column. A teacher must never see progress data for a course they do not own.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">PROG-02</td><td>Clicking a student row shows their full ordered session list: session number, lesson title, date, assessment outcome, and whether the lesson had an interactive block. Scoped to the teacher's own course only.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">PROG-03</td><td>Teacher can read the full rendered lesson content of any lesson delivered to any student in their own courses. This exists for generation quality review — not student grading. A request for a lesson in a course the teacher does not own returns 404 at the API level (the resource is outside their visible scope; see the error-handling policy in the TSD), not merely hidden in the UI.</td><td><span class="pri ps">SHOULD</span></td></tr>
+      <tr><td class="req-id">PROG-04</td><td>Student home screen shows all enrolled active courses with a session counter ("7 sessions completed") and last session date per course.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">PROG-05</td><td>Within a course, the student sees an ordered session list with lesson title and assessment outcome per session. They can re-read any past lesson but cannot re-take its assessment.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td class="req-id">PROG-06</td><td>At the top of each lesson, the student sees a simple context line that makes the adaptation visible rather than opaque. If the session is a reinforcement session (i.e. it revisits a concept from concepts_missed in a prior session), the line reads: "Today's lesson revisits [concept] from your last session." For a regular progression session it reads: "Session [N] of approx. [approximate_lessons]." This is generated from session metadata — it does not require an additional AI call.</td><td><span class="pri ps">SHOULD</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- S17: DATA MODELS -->
+<div class="section" id="s17">
+  <div class="section-header"><span class="sec-num">17</span><h2 class="sec-title">Data Models</h2></div>
+  <p>Core relational model for the MVP. All tables include created_at and updated_at unless noted. Field names use snake_case. PostgreSQL JSONB is used for structured sub-documents (lesson blocks, assessment questions).</p>
+  <div class="callout cn"><strong>Canonical Field Names</strong>To prevent the database, the block schema, the context object, and the API contract from drifting apart, the following names are canonical and used identically everywhere: <code>lesson_title</code> (not <code>title</code>), <code>estimated_read_minutes</code> (not <code>estimated_read_mins</code>), <code>key_concepts_covered</code> for the session-history field, and <code>assessment_outcome</code> for the outcome field in every context — including the summarised-history JSON. Any deliberate database-to-API rename must be documented explicitly in the TSD API contract; there are none in MVP.</div>
+  <div class="codeblock">
+    <div class="cb-label">PostgreSQL Schema — MVP</div>
+    <pre>
+<span class="c-comment">-- Root entity. All data is school-scoped.</span>
+<span class="c-entity">TABLE schools</span> {
+  <span class="c-pk">id</span>               <span class="c-type">UUID PRIMARY KEY DEFAULT gen_random_uuid()</span>
+  name             <span class="c-type">VARCHAR(200) NOT NULL</span>
+  created_at       <span class="c-type">TIMESTAMPTZ NOT NULL DEFAULT now()</span>
+}
+
+<span class="c-comment">-- All human actors. Role determines access. Django owns identity and authorisation.</span>
+<span class="c-entity">TABLE users</span> {
+  <span class="c-pk">id</span>               <span class="c-type">UUID PRIMARY KEY DEFAULT gen_random_uuid()</span>
+  school_id        <span class="c-type">UUID NOT NULL REFERENCES schools(id)</span>
+  password_hash    <span class="c-type">VARCHAR(255) NOT NULL</span>   <span class="c-comment">-- Django-managed (PBKDF2/argon2)</span>
+  force_password_change  <span class="c-type">BOOLEAN NOT NULL DEFAULT TRUE</span>
+  name             <span class="c-type">VARCHAR(200) NOT NULL</span>
+  email            <span class="c-type">VARCHAR(320) UNIQUE NOT NULL</span>
+  role             <span class="c-type">VARCHAR(20) NOT NULL CHECK (role IN ('admin','teacher','student'))</span>
+  is_active        <span class="c-type">BOOLEAN NOT NULL DEFAULT TRUE</span>
+  created_at       <span class="c-type">TIMESTAMPTZ NOT NULL DEFAULT now()</span>
+  updated_at       <span class="c-type">TIMESTAMPTZ NOT NULL DEFAULT now()</span>
+}
+
+<span class="c-comment">-- Teacher-authored course briefs. One teacher per course in MVP.</span>
+<span class="c-entity">TABLE courses</span> {
+  <span class="c-pk">id</span>               <span class="c-type">UUID PRIMARY KEY DEFAULT gen_random_uuid()</span>
+  school_id        <span class="c-type">UUID NOT NULL REFERENCES schools(id)</span>
+  teacher_id       <span class="c-type">UUID REFERENCES users(id)</span>                <span class="c-comment">-- Nullable: NULL when teacher is deactivated and course is unassigned</span>
+  title            <span class="c-type">VARCHAR(200) NOT NULL</span>
+  subject          <span class="c-type">VARCHAR(100) NOT NULL</span>
+  target_level     <span class="c-type">VARCHAR(100) NOT NULL</span>
+  learning_outcomes        <span class="c-type">TEXT NOT NULL</span>
+  topic_sequence           <span class="c-type">TEXT NOT NULL</span>
+  exam_context             <span class="c-type">TEXT</span>
+  special_instructions     <span class="c-type">TEXT</span>
+  approximate_lessons      <span class="c-type">INTEGER NOT NULL CHECK (approximate_lessons BETWEEN 10 AND 120)</span>
+  status           <span class="c-type">VARCHAR(20) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','active','archived'))</span>
+  created_at       <span class="c-type">TIMESTAMPTZ NOT NULL DEFAULT now()</span>
+  updated_at       <span class="c-type">TIMESTAMPTZ NOT NULL DEFAULT now()</span>
+}
+
+<span class="c-comment">-- Links students to courses. Independent context per enrollment.</span>
+<span class="c-entity">TABLE enrollments</span> {
+  <span class="c-pk">id</span>               <span class="c-type">UUID PRIMARY KEY DEFAULT gen_random_uuid()</span>
+  course_id        <span class="c-type">UUID NOT NULL REFERENCES courses(id)</span>
+  student_id       <span class="c-type">UUID NOT NULL REFERENCES users(id)</span>
+  status           <span class="c-type">VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('active','unenrolled'))</span>
+  last_session_at  <span class="c-type">TIMESTAMPTZ</span>
+  enrolled_at      <span class="c-type">TIMESTAMPTZ NOT NULL DEFAULT now()</span>
+  <span class="c-constraint">UNIQUE (course_id, student_id)</span>
+}
+
+<span class="c-comment">-- Session lifecycle. State machine per Section 10.</span>
+<span class="c-entity">TABLE sessions</span> {
+  <span class="c-pk">id</span>               <span class="c-type">UUID PRIMARY KEY DEFAULT gen_random_uuid()</span>
+  enrollment_id    <span class="c-type">UUID NOT NULL REFERENCES enrollments(id)</span>
+  session_number   <span class="c-type">INTEGER NOT NULL</span>
+  status           <span class="c-type">VARCHAR(20) NOT NULL DEFAULT 'pending'</span>
+                   <span class="c-comment">-- CHECK (status IN ('pending','generating','active','assessing','complete','abandoned'))
+                   -- No 'failed' value: a failed generation deletes the row (SESS-03).</span>
+  started_at       <span class="c-type">TIMESTAMPTZ</span>
+  completed_at     <span class="c-type">TIMESTAMPTZ</span>
+  time_on_lesson_secs  <span class="c-type">INTEGER</span>
+  <span class="c-constraint">UNIQUE (enrollment_id, session_number)</span>
+}
+
+<span class="c-comment">-- Generated lesson content. One per session. Immutable after creation.</span>
+<span class="c-entity">TABLE lessons</span> {
+  <span class="c-pk">id</span>               <span class="c-type">UUID PRIMARY KEY DEFAULT gen_random_uuid()</span>
+  session_id       <span class="c-type">UUID UNIQUE NOT NULL REFERENCES sessions(id)</span>
+  lesson_title     <span class="c-type">VARCHAR(300) NOT NULL</span>
+  blocks           <span class="c-type">JSONB NOT NULL</span>             <span class="c-comment">-- Array of block objects per Section 13.2</span>
+  key_concepts     <span class="c-type">JSONB NOT NULL</span>             <span class="c-comment">-- String array, 3-5 items</span>
+  estimated_read_minutes  <span class="c-type">INTEGER</span>
+  has_interactive  <span class="c-type">BOOLEAN NOT NULL DEFAULT FALSE</span>
+  agent_plan       <span class="c-type">TEXT NOT NULL</span>             <span class="c-comment">-- Contents of &lt;plan&gt; tags. Never shown to users.</span>
+  prompt_context   <span class="c-type">JSONB NOT NULL</span>             <span class="c-comment">-- Full context object passed to agent. Diagnostics.</span>
+  raw_response     <span class="c-type">TEXT NOT NULL</span>             <span class="c-comment">-- Full raw agent response before parsing.</span>
+  generated_at     <span class="c-type">TIMESTAMPTZ NOT NULL DEFAULT now()</span>
+}
+
+<span class="c-comment">-- MCQ assessment for each lesson.</span>
+<span class="c-entity">TABLE assessments</span> {
+  <span class="c-pk">id</span>               <span class="c-type">UUID PRIMARY KEY DEFAULT gen_random_uuid()</span>
+  lesson_id        <span class="c-type">UUID UNIQUE NOT NULL REFERENCES lessons(id)</span>
+  questions        <span class="c-type">JSONB NOT NULL</span>
+  <span class="c-comment">  -- Array of: { question_text, concept_tag, options:[{id,text}],
+  --   correct_option_id, correct_explanation, wrong_explanations:{id:text} }</span>
+  generated_at     <span class="c-type">TIMESTAMPTZ NOT NULL DEFAULT now()</span>
+}
+
+<span class="c-comment">-- Student responses. One row per question. Posted immediately on confirmation.</span>
+<span class="c-entity">TABLE assessment_responses</span> {
+  <span class="c-pk">id</span>               <span class="c-type">UUID PRIMARY KEY DEFAULT gen_random_uuid()</span>
+  assessment_id    <span class="c-type">UUID NOT NULL REFERENCES assessments(id)</span>
+  session_id       <span class="c-type">UUID NOT NULL REFERENCES sessions(id)</span>
+  question_index   <span class="c-type">INTEGER NOT NULL CHECK (question_index BETWEEN 0 AND 3)</span>
+  selected_option  <span class="c-type">VARCHAR(5) NOT NULL</span>
+  is_correct       <span class="c-type">BOOLEAN NOT NULL</span>
+  answered_at      <span class="c-type">TIMESTAMPTZ NOT NULL DEFAULT now()</span>
+  <span class="c-constraint">UNIQUE (assessment_id, session_id, question_index)</span>
+}
+
+<span class="c-comment">-- Session history summary. Written on session COMPLETE. Immutable. Read by Context Assembly.</span>
+<span class="c-entity">TABLE session_history</span> {
+  <span class="c-pk">id</span>               <span class="c-type">UUID PRIMARY KEY DEFAULT gen_random_uuid()</span>
+  enrollment_id    <span class="c-type">UUID NOT NULL REFERENCES enrollments(id)</span>
+  session_id       <span class="c-type">UUID UNIQUE NOT NULL REFERENCES sessions(id)</span>
+  session_number   <span class="c-type">INTEGER NOT NULL</span>
+  lesson_title     <span class="c-type">VARCHAR(300) NOT NULL</span>
+  key_concepts_covered  <span class="c-type">JSONB NOT NULL</span>      <span class="c-comment">-- String array; matches the §15.1 field name</span>
+  had_interactive  <span class="c-type">BOOLEAN NOT NULL DEFAULT FALSE</span>
+  assessment_outcome   <span class="c-type">VARCHAR(30) NOT NULL</span>
+                       <span class="c-comment">-- CHECK (assessment_outcome IN ('strong','adequate','needs_reinforcement','not_taken'))</span>
+  concepts_missed  <span class="c-type">JSONB NOT NULL DEFAULT '[]'</span>   <span class="c-comment">-- String array</span>
+  time_on_lesson_secs  <span class="c-type">INTEGER</span>
+  completed_at     <span class="c-type">TIMESTAMPTZ NOT NULL</span>
+}</pre>
+  </div>
+</div>
+
+<!-- S18: NON-FUNCTIONAL -->
+<div class="section" id="s18">
+  <div class="section-header"><span class="sec-num">18</span><h2 class="sec-title">Non-Functional Requirements</h2></div>
+  <table class="rtable" style="margin-top:18px;">
+    <thead><tr><th style="width:120px">Category</th><th>Requirement</th><th style="width:90px">Priority</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Security</strong></td><td>All traffic served over HTTPS. HTTP redirected. TLS 1.2 minimum. Enforced by Railway's proxy layer.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td><strong>Security</strong></td><td>All API endpoints require a valid Django-issued JWT. Student data is only accessible to: the student themselves, their course teacher, and the school admin. No cross-school data access at any layer.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td><strong>Security</strong></td><td>Interactive HTML blocks are sandboxed via iframe with sandbox="allow-scripts" only — no allow-same-origin. Server-side validation before storage per AGENT-05.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td><strong>Performance</strong></td><td>All UI interactions excluding AI generation calls respond within 1 second. AI generation displays a streaming lesson (tokens visible within 3 seconds of session start) rather than a blank loading screen.</td><td><span class="pri ps">SHOULD</span></td></tr>
+      <tr><td><strong>Deployment</strong></td><td>Django runs under Gunicorn with Uvicorn workers (ASGI). Procfile: gunicorn paideia.asgi:application -k uvicorn.workers.UvicornWorker. Minimum 2 workers for MVP. This is non-negotiable for async views to function correctly.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td><strong>Streaming</strong></td><td>Railway nginx proxy buffering is disabled via X-Accel-Buffering: no header on all SSE endpoints. Without this, streaming is silently degraded to batch delivery.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td><strong>Browser Support</strong></td><td>Desktop web only. Chrome, Firefox, Safari, Edge — last 2 major versions each. Mobile browser support not required for MVP.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td><strong>Data</strong></td><td>Daily automated database backups via Railway. 30-day retention. Restore procedure documented and tested before pilot school goes live.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td><strong>Logging</strong></td><td>All Anthropic API calls logged with: timestamp, session_id, enrollment_id, model version, prompt token count, completion token count, response time, success/failure. Retained 90 days. Primary diagnostic tool for content quality issues.</td><td><span class="pri pm">MUST</span></td></tr>
+      <tr><td><strong>Scale</strong></td><td>MVP targets: 1 pilot school, up to 5 active courses, up to 200 enrolled students, up to 50 concurrent sessions. No horizontal scaling required beyond this for MVP phase.</td><td><span class="pri ps">SHOULD</span></td></tr>
+      <tr><td><strong>Environment</strong></td><td>Separate Railway environments for development, staging, and production. Staging uses a separate Anthropic API key with usage alerts. Production ANTHROPIC_MODEL_VERSION is independently configurable from staging.</td><td><span class="pri ps">SHOULD</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- S19: ACCEPTANCE CRITERIA -->
+<div class="section" id="s19">
+  <div class="section-header"><span class="sec-num">19</span><h2 class="sec-title">Acceptance Criteria</h2></div>
+  <p>The MVP is complete when every criterion below is verifiably demonstrated. These are tests, not aspirations. Each must be shown working — not asserted.</p>
+  <ul class="ac-list">
+    <li><span class="ac-id">AC-01</span>An administrator can create a school account, create one teacher account, create five student accounts, and assign all five to a single course — completing the full setup flow without technical assistance.</li>
+    <li><span class="ac-id">AC-02</span>A teacher can create a complete course brief, activate it, enroll five students directly from the teacher interface, and see those students in the progress view — without requiring any admin action beyond initial account creation.</li>
+    <li><span class="ac-id">AC-03</span>A student can initiate a session and see the first streamed text appear within 3 seconds. Text content renders progressively as it streams; interactive blocks appear once the lesson completes and the parsed block array is fetched. Total lesson delivery completes within 30 seconds.</li>
+    <li><span class="ac-id">AC-04</span>A lesson containing an interactive block renders the iframe correctly. The student can interact with the visual. Closing the interactive does not affect the rest of the lesson. The interactive block has no access to the parent page (verified by attempting window.parent.document access in browser console — must throw security error).</li>
+    <li><span class="ac-id">AC-05</span>A student completes the 4-question assessment question by question. Each answer confirmation immediately shows correct/incorrect feedback and explanation. The session summary is correct and the session is marked complete.</li>
+    <li><span class="ac-id">AC-06</span>A student who completes 5 sequential sessions receives lessons that do not meaningfully repeat already-covered content at the same depth. Verified by independent review of 5 lesson titles and key concept lists.</li>
+    <li><span class="ac-id">AC-07</span>A student who scores ≤2/4 on Session N receives a lesson in Session N+1 or N+2 that demonstrably revisits one or more missed concepts from Session N. Verified by comparing concepts_missed from history to key_concepts in subsequent lesson.</li>
+    <li><span class="ac-id">AC-08</span>A student who closes their browser mid-lesson returns to find the same lesson loaded — not regenerated. A student who closes during the assessment returns to find their already-answered questions preserved.</li>
+    <li><span class="ac-id">AC-09</span>If the Anthropic API returns an error, the student sees a clean error message and returns to their course home. Their session count does not increment. No partial or broken lesson is shown.</li>
+    <li><span class="ac-id">AC-10</span>No student can access another student's lessons, history, or assessment results. Verified by attempting cross-student data access via authenticated API calls with a different student's token — all must return 403.</li>
+    <li><span class="ac-id">AC-11</span>The full prompt context for any session is retrievable from logs by session_id with enough information to exactly reproduce the generation call that produced the lesson.</li>
+    <li><span class="ac-id">AC-12</span>An interactive block whose HTML fails server-side validation is replaced in the block array with a plain text fallback block. The lesson is delivered with all other blocks intact and the fallback in the failed block's place. The failure is logged. No error is shown to the student.</li>
+    <li><span class="ac-id">AC-13</span>A teacher authenticated with a valid JWT cannot access the progress view, lesson content, or enrollment list of a course they do not own. Such requests return 404 — the resource is outside the teacher's visible scope, and 404 (not 403) is the deliberate anti-enumeration policy. Verified by direct API call with the teacher's token against another teacher's course endpoints.</li>
+    <li><span class="ac-id">AC-14</span>When a teacher account is deactivated, their active courses remain accessible to enrolled students. Students can open sessions and receive generated lessons without interruption. The admin sees the deactivated teacher's courses flagged for reassignment in the admin panel.</li>
+  </ul>
+</div>
+
+</div><!-- /content -->
+
+<!-- S20: FULL SYSTEM ROADMAP -->
+<div class="future-section" id="s20">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="fs-eyebrow">Section 20 — Post-MVP Capabilities</div>
+    <h2>Full System Capability Roadmap</h2>
+    <p class="fs-sub">These capabilities are outside MVP scope and must not be built in this phase. They are catalogued here to ensure MVP architecture decisions leave room for them, and to define the full product vision beyond the core loop.</p>
+    <div class="future-grid">
+      <div class="future-card"><div class="fc-cat">Curriculum</div><h4>National Curriculum Standards Mapping</h4><p>Structured integration of regional frameworks (WAEC, Common Core, UK NC, IB, IGCSE, CBC). Agent anchors lessons to specific learning objectives. Standards coverage tracked per student.</p></div>
+      <div class="future-card"><div class="fc-cat">Curriculum</div><h4>Prerequisite &amp; Dependency Graphs</h4><p>Subject-level knowledge graph enforcing pedagogical sequencing. Prevents the agent from generating content that requires knowledge the student hasn't been exposed to.</p></div>
+      <div class="future-card"><div class="fc-cat">Teacher Tools</div><h4>Content Review &amp; Approval Queue</h4><p>Pre-delivery teacher review of AI-generated lessons. Configurable per course: pre-delivery approval, post-delivery audit, or full trust. Annotation tools and override capability.</p></div>
+      <div class="future-card"><div class="fc-cat">Teacher Tools</div><h4>Concept Struggle Maps</h4><p>Visual per-student and per-class maps of concepts consistently missed. Identifies students needing in-class intervention. Bridges AI-generated learning with teacher-led instruction.</p></div>
+      <div class="future-card"><div class="fc-cat">Safety</div><h4>Content Moderation Layer</h4><p>Automated age-appropriateness filtering and harmful content detection in the generation pipeline. Hard-block and soft-flag modes with escalation to teacher and admin.</p></div>
+      <div class="future-card"><div class="fc-cat">Safety</div><h4>Fact Confidence Scoring</h4><p>Heuristic layer flagging low-confidence factual claims in generated content for teacher review. Critical for science, history, and current affairs subjects.</p></div>
+      <div class="future-card"><div class="fc-cat">Assessment</div><h4>Open-Ended &amp; Short-Answer Assessment</h4><p>AI-evaluated open-ended questions testing higher-order thinking beyond MCQ. Rubric generation, answer evaluation, and qualitative feedback per response.</p></div>
+      <div class="future-card"><div class="fc-cat">Assessment</div><h4>Exam Simulation Mode</h4><p>Course-end full mock exam aligned to the exam_context from the course brief. Timed and invigilated mode with post-submission detailed review per question.</p></div>
+      <div class="future-card"><div class="fc-cat">Personalisation</div><h4>Teaching Style Adaptation</h4><p>Beyond content difficulty — the agent adapts its pedagogical approach (Socratic, worked examples, analogy-led, direct instruction) based on inferred student preference signals.</p></div>
+      <div class="future-card"><div class="fc-cat">Rendering</div><h4>Video &amp; External Media Embeds</h4><p>Agent-sourced or teacher-approved video embeds for subjects where motion and narration are essential to understanding. Requires a content sourcing strategy separate from generation.</p></div>
+      <div class="future-card"><div class="fc-cat">Stakeholders</div><h4>Parent Portal</h4><p>Guardian-facing progress digests in plain language. Parental consent management, data rights dashboard, and opt-in weekly summaries. Handles COPPA and GDPR-K consent flows.</p></div>
+      <div class="future-card"><div class="fc-cat">Stakeholders</div><h4>Admin Analytics Console</h4><p>School-wide reporting: standards coverage compliance, cohort performance comparisons, AI content quality metrics, and licence utilisation. The dashboard that sells renewals.</p></div>
+      <div class="future-card"><div class="fc-cat">Infrastructure</div><h4>SSO &amp; Identity Provider Integration</h4><p>Google Workspace, Microsoft 365, and SAML 2.0 via a library such as python-social-auth or django-allauth. Eliminates school-managed credentials. Maps existing identity to Paideia roles automatically.</p></div>
+      <div class="future-card"><div class="fc-cat">Infrastructure</div><h4>Offline / Low-Connectivity Mode</h4><p>Pre-generation of lesson batches for low-connectivity environments. Lessons cached to device. Assessment responses queued locally and synced on reconnection. Critical for emerging market adoption.</p></div>
+      <div class="future-card"><div class="fc-cat">Infrastructure</div><h4>Data Residency &amp; Compliance Controls</h4><p>Regional storage for strict localisation markets (EU GDPR, POPIA, UK DPA). Configurable anonymisation for AI API calls. Required before entering regulated markets at scale.</p></div>
+      <div class="future-card"><div class="fc-cat">Engagement</div><h4>Engagement &amp; Motivation Layer</h4><p>Progress milestones, streak tracking, concept mastery badges, and optional peer challenge modes. Designed for younger learners who need motivation mechanics beyond content quality alone.</p></div>
+      <div class="future-card"><div class="fc-cat">Engagement</div><h4>Mobile Application</h4><p>Native iOS and Android with full lesson delivery, assessment, and progress. Push notifications for session reminders. Full offline support via cached lesson bundles.</p></div>
+      <div class="future-card"><div class="fc-cat">Platform</div><h4>Paideia API</h4><p>Exposed curriculum generation as a standalone API product for EdTech developers. Standards-aligned, age-appropriate lesson and assessment generation for third-party integrations.</p></div>
+    </div>
+    <div style="margin-top:40px;padding-top:28px;border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(255,255,255,0.2);">PAIDEIA · PAI-FSD-001 · v2.0 Draft · MVP Functional Specification</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(255,255,255,0.15);">Internal — Confidential</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+const sections = document.querySelectorAll('[id^="s"]');
+const navLinks = document.querySelectorAll('.nav-item, .nav-sub');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(n => {
+        n.classList.remove('active');
+        if (n.getAttribute('href') === '#' + e.target.id) n.classList.add('active');
+      });
+    }
+  });
+}, { rootMargin: '-15% 0px -75% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

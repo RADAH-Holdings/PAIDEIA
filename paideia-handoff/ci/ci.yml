@@ -1,0 +1,46 @@
+# Copy to .github/workflows/ci.yml
+# Runs on every PR. A wave is not done until these pass for its scope.
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Install
+        working-directory: backend
+        run: pip install -r requirements.txt
+      - name: Lint
+        working-directory: backend
+        run: ruff check .
+      - name: Migration check
+        working-directory: backend
+        run: python manage.py makemigrations --check --dry-run
+      - name: Unit + integration tests
+        working-directory: backend
+        run: pytest -q
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: Install
+        working-directory: frontend
+        run: npm ci
+      - name: Lint + types
+        working-directory: frontend
+        run: npm run lint && npm run typecheck
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+      - name: Tests
+        working-directory: frontend
+        run: npm test
