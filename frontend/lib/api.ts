@@ -8,7 +8,10 @@ import {
 } from "@/lib/schemas";
 import { getAccessToken, getRefreshToken, setAuthCookies } from "@/lib/cookies";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+/** No trailing slash — paths like `/auth/login` must not produce `//api/...`. */
+const API_BASE = (
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1"
+).replace(/\/+$/, "");
 
 export class ApiError extends Error {
   constructor(

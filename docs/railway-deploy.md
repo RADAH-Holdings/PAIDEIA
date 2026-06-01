@@ -22,7 +22,11 @@ Optional: leave **Config file path** empty, or point at `/railway.toml` (Nixpack
    - `DATABASE_URL` — reference the Railway Postgres plugin
    - `CORS_ALLOWED_ORIGINS` — public URL of the frontend (e.g. `https://paideia-web-production.up.railway.app`)
    - `DJANGO_ALLOWED_HOSTS` — API hostname (e.g. `paideia-api-production.up.railway.app`)
-5. After first deploy: open a shell and run `python manage.py seed_admin` (or set `SEED_*` env vars before seeding)
+5. After first deploy: open a **shell** on the backend service and run:
+   ```bash
+   python manage.py seed_admin
+   ```
+   `SEED_*` variables only supply defaults to that command — they do **not** create a user on their own.
 
 ## Frontend service (`paideia-web`)
 
@@ -42,3 +46,17 @@ Optional: leave **Config file path** empty, or point at `/railway.toml` (Nixpack
 **Nixpacks cannot generate a build plan** — Root Directory is empty or `/` (repo root). Set it to `backend` or `frontend`.
 
 **`preDeployCommand: Array must contain at most 1 element`** — Do not put a multi-element array in `railway.toml`. Use the dashboard **Pre-deploy command** as one string: `python manage.py migrate --noinput`.
+
+**`POST /api/v1/auth/login` returns 500** — The app reached Django but something failed server-side. Common causes:
+
+1. **Migrations not applied** — Run pre-deploy `python manage.py migrate --noinput`, or in a shell: `python manage.py migrate`. Without tables, login raises a database error (500).
+2. **No admin user** — Run `python manage.py seed_admin` once in a Railway shell (with `SEED_*` set if you want custom email/password).
+3. **`DATABASE_URL` missing or wrong** — Backend service must reference the Postgres plugin; check Variables.
+
+Check **Deploy logs** (runtime) or open a shell and run `python manage.py showmigrations accounts` — all should show `[X]`.
+
+**`//api/v1/...` returns 404** — Frontend `NEXT_PUBLIC_API_URL` has a **trailing slash**. Use:
+
+`https://<api-host>/api/v1` (no slash at the end)
+
+Wrong: `https://<api-host>/api/v1/`
