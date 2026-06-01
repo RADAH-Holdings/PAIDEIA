@@ -59,7 +59,7 @@ Full wave index: [`tasks/README.md`](tasks/README.md).
 
 The repo root cannot be deployed as one service. See [`docs/railway-deploy.md`](docs/railway-deploy.md).
 
-In each Railway **web** service, set **Root Directory** to `backend` or `frontend` (not `/`). Backend migrations: dashboard **Pre-deploy command** `python manage.py migrate --noinput`.
+In each Railway **web** service, set **Root Directory** to `backend` or `frontend` (not `/`). Backend migrations: pre-deploy `/opt/venv/bin/python manage.py migrate --noinput`; seed via SSH `/opt/venv/bin/python manage.py seed_admin`.
 
 ## Dependency chain
 
