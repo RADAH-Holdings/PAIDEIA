@@ -1,5 +1,4 @@
-# Copy to .github/workflows/ci.yml
-# Runs on every PR. A wave is not done until these pass for its scope.
+# Runs on every PR. App jobs activate automatically once backend/ and frontend/ exist (Wave 1+).
 name: CI
 on:
   pull_request:
@@ -7,12 +6,31 @@ on:
     branches: [main]
 
 jobs:
-  backend:
+  docs:
+    name: Spec layout
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Verify canonical docs and tasks
+        run: |
+          set -euo pipefail
+          test -f AGENTS.md
+          test -f docs/fsd.md
+          test -f docs/tsd.md
+          test -f docs/design-system.md
+          test -f tasks/README.md
+          test -f tasks/phase-01.md
+          echo "Spec layout OK"
+
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    if: hashFiles('backend/requirements.txt') != ''
+    steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: '3.12' }
+        with:
+          python-version: "3.12"
       - name: Install
         working-directory: backend
         run: pip install -r requirements.txt
@@ -27,11 +45,14 @@ jobs:
         run: pytest -q
 
   frontend:
+    name: Frontend
     runs-on: ubuntu-latest
+    if: hashFiles('frontend/package.json') != ''
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '20' }
+        with:
+          node-version: "20"
       - name: Install
         working-directory: frontend
         run: npm ci
