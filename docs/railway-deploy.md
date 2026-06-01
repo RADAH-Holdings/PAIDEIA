@@ -25,6 +25,7 @@ Optional: leave **Config file path** empty, or point at `/railway.toml` (Nixpack
    - `DATABASE_URL` — reference the Railway Postgres plugin
    - `CORS_ALLOWED_ORIGINS` — public URL of the frontend (e.g. `https://paideia-web-production.up.railway.app`)
    - `DJANGO_ALLOWED_HOSTS` — API hostname (e.g. `paideia-api-production.up.railway.app`)
+   - Leave `JWT_SIGNING_KEY` **unset** (or set a real secret). An empty variable causes `HMAC key must not be empty` on login.
 5. After first deploy: `railway ssh` into the backend (or use the dashboard shell) and run:
    ```bash
    /opt/venv/bin/python manage.py migrate --noinput
@@ -56,6 +57,8 @@ Optional: leave **Config file path** empty, or point at `/railway.toml` (Nixpack
 **`preDeployCommand: Array must contain at most 1 element`** — Do not put a multi-element array in `railway.toml`. Use the dashboard **Pre-deploy command** as one string: `/opt/venv/bin/python manage.py migrate --noinput`.
 
 **`ModuleNotFoundError: No module named 'django'` in SSH** — Use `/opt/venv/bin/python`, not bare `python`. Same for pre-deploy if migrations never ran.
+
+**`jwt.exceptions.InvalidKeyError: HMAC key must not be empty`** — `JWT_SIGNING_KEY` is defined in Railway but empty. Delete that variable (JWTs will use `DJANGO_SECRET_KEY`) or set it to a long random string. Redeploy after changing variables.
 
 **`POST /api/v1/auth/login` returns 500** — The app reached Django but something failed server-side. Common causes:
 

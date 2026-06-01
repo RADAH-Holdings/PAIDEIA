@@ -111,7 +111,8 @@ REST_FRAMEWORK = {
     "UNAUTHENTICATED_USER": None,
 }
 
-_jwt_signing_key = os.environ.get("JWT_SIGNING_KEY", SECRET_KEY)
+# Railway often defines JWT_SIGNING_KEY with no value — treat blank as unset.
+_jwt_signing_key = (os.environ.get("JWT_SIGNING_KEY") or "").strip() or SECRET_KEY
 _access_minutes = int(os.environ.get("JWT_ACCESS_LIFETIME", "30"))
 _refresh_days = int(os.environ.get("JWT_REFRESH_LIFETIME", "7"))
 
