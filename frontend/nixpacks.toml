@@ -1,0 +1,4 @@
+# Railway/Nixpacks reads this when Root Directory is `frontend`.
+# Node 18 is the Nixpacks default; vite/eslint deps require Node 20+.
+[variables]
+NIXPACKS_NODE_VERSION = "20"
