@@ -31,10 +31,11 @@ def create_school_user(
 def deactivate_user(*, admin: User, target: User) -> dict:
     target.is_active = False
     target.save(update_fields=["is_active", "updated_at"])
-    # W3: populate from Course model; empty until courses exist.
     affected_courses: list[dict] = []
     if target.role == User.Role.TEACHER:
-        affected_courses = []
+        from courses.services import active_courses_for_teacher
+
+        affected_courses = active_courses_for_teacher(target)
     return {
         "id": target.id,
         "is_active": target.is_active,

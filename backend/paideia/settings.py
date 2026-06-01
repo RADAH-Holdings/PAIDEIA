@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "accounts",
+    "courses",
     "common",
 ]
 
@@ -115,27 +116,11 @@ REST_FRAMEWORK = {
     "UNAUTHENTICATED_USER": None,
 }
 
-_zeptomail_token = (os.environ.get("ZEPTOMAIL_SEND_MAIL_TOKEN") or "").strip()
-if _zeptomail_token:
-    # ZeptoMail Send Mail Token (API). See docs/railway-deploy.md.
-    EMAIL_BACKEND = (
-        "zoho_zeptomail.backend.zeptomail_backend.ZohoZeptoMailEmailBackend"
-    )
-    ZOHO_ZEPTOMAIL_API_KEY_TOKEN = _zeptomail_token
-    ZOHO_ZEPTOMAIL_HOSTED_REGION = (
-        os.environ.get("ZEPTOMAIL_HOSTED_REGION", "zeptomail.zoho.com").strip()
-        or "zeptomail.zoho.com"
-    )
-    DEFAULT_FROM_EMAIL = os.environ.get(
-        "ZEPTOMAIL_FROM_EMAIL",
-        os.environ.get("DEFAULT_FROM_EMAIL", "noreply@paideia.local"),
-    )
-else:
-    EMAIL_BACKEND = os.environ.get(
-        "EMAIL_BACKEND",
-        "django.core.mail.backends.console.EmailBackend",
-    )
-    DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@paideia.local")
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend",
+)
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@paideia.local")
 PAIDEIA_WEB_ORIGIN = os.environ.get("PAIDEIA_WEB_ORIGIN", "")
 
 # Railway often defines JWT_SIGNING_KEY with no value — treat blank as unset.

@@ -6,7 +6,10 @@ import { useEffect, type ReactNode } from "react";
 
 import { useAuth } from "@/lib/auth";
 
-const NAV = [{ href: "/admin/users", label: "Users" }];
+const NAV = [
+  { href: "/admin/users", label: "Users" },
+  { href: "/admin/courses", label: "Courses" },
+];
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const router = useRouter();

@@ -35,6 +35,11 @@ class IsCourseOwnerOrAdmin(BasePermission):
         user = request.user
         if not user or not user.is_authenticated:
             return False
+        school_id = getattr(obj, "school_id", None)
+        if school_id is None and hasattr(obj, "school"):
+            school_id = obj.school_id
+        if school_id != user.school_id:
+            return False
         if user.role == User.Role.ADMIN:
             return True
         teacher_id = getattr(obj, "teacher_id", None)
