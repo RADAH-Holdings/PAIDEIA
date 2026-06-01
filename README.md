@@ -59,7 +59,7 @@ Full wave index: [`tasks/README.md`](tasks/README.md).
 
 The repo root cannot be deployed as one service. See [`docs/railway-deploy.md`](docs/railway-deploy.md).
 
-Quick fix for the Nixpacks error: in each Railway **web** service, set **Root Directory** to `backend` or `frontend` (not `/`), and set **Config file path** to `/backend/railway.toml` or `/frontend/railway.toml`.
+In each Railway **web** service, set **Root Directory** to `backend` or `frontend` (not `/`). Backend migrations: dashboard **Pre-deploy command** `python manage.py migrate --noinput`.
 
 ## Dependency chain
 
