@@ -55,6 +55,12 @@ Full wave index: [`tasks/README.md`](tasks/README.md).
 | [`docs/tsd.md`](docs/tsd.md) | Architecture, API contract, data model |
 | [`docs/design-system.md`](docs/design-system.md) | Visual tokens and component specs |
 
+## Railway deployment
+
+The repo root cannot be deployed as one service. See [`docs/railway-deploy.md`](docs/railway-deploy.md).
+
+Quick fix for the Nixpacks error: in each Railway **web** service, set **Root Directory** to `backend` or `frontend` (not `/`), and set **Config file path** to `/backend/railway.toml` or `/frontend/railway.toml`.
+
 ## Dependency chain
 
 ```
