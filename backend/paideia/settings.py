@@ -106,10 +106,21 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+        "accounts.force_password.ForcePasswordChangePermission",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "common.pagination.PaideiaPagination",
     "EXCEPTION_HANDLER": "common.exceptions.api_exception_handler",
     "UNAUTHENTICATED_USER": None,
 }
+
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend",
+)
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@paideia.local")
+PAIDEIA_WEB_ORIGIN = os.environ.get("PAIDEIA_WEB_ORIGIN", "")
 
 # Railway often defines JWT_SIGNING_KEY with no value — treat blank as unset.
 _jwt_signing_key = (os.environ.get("JWT_SIGNING_KEY") or "").strip() or SECRET_KEY

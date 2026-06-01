@@ -1,13 +1,11 @@
 from common.exceptions import error_envelope
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenRefreshView
 
 from accounts.models import User
-from accounts.serializers import MeSerializer
 
 LOGIN_ERROR_MESSAGE = "Email or password is incorrect."
 
@@ -55,17 +53,3 @@ class LoginView(APIView):
             },
             status=status.HTTP_200_OK,
         )
-
-
-class RefreshView(TokenRefreshView):
-    permission_classes = [AllowAny]
-    authentication_classes: list = []
-
-
-class MeView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        user = User.objects.select_related("school").get(pk=request.user.pk)
-        serializer = MeSerializer(user)
-        return Response(serializer.data)

@@ -11,6 +11,16 @@ def error_envelope(*, code: str, message: str, detail=None, http_status: int = 4
 
 
 def api_exception_handler(exc, context):
+    from accounts.passwords import PasswordChangeRequired
+
+    if isinstance(exc, PasswordChangeRequired):
+        return error_envelope(
+            code=exc.default_code,
+            message=str(exc.detail),
+            detail=None,
+            http_status=exc.status_code,
+        )
+
     response = exception_handler(exc, context)
     if response is None:
         return None

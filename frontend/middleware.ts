@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const ACCESS_COOKIE = "paideia_access";
-const PUBLIC_PATHS = ["/sign-in"];
+const PUBLIC_PATHS = ["/sign-in", "/change-password", "/reset-password"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
