@@ -14,10 +14,14 @@ import { ApiError, fetchMe, login as apiLogin, roleHomePath } from "@/lib/api";
 import { clearAuthCookies, getAccessToken } from "@/lib/cookies";
 import type { Me } from "@/lib/schemas";
 
+type LoginResult =
+  | { forcePasswordChange: true; me: null }
+  | { forcePasswordChange: false; me: Me };
+
 type AuthState = {
   user: Me | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<Me>;
+  login: (email: string, password: string) => Promise<LoginResult>;
   logout: () => void;
   refreshUser: () => Promise<Me | null>;
 };
@@ -37,7 +41,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const me = await fetchMe();
       setUser(me);
       return me;
-    } catch {
+    } catch (err) {
+      if (
+        err instanceof ApiError &&
+        err.code === "password_change_required" &&
+        typeof window !== "undefined" &&
+        !window.location.pathname.startsWith("/change-password")
+      ) {
+        window.location.href = "/change-password";
+      }
       setUser(null);
       return null;
     }
@@ -51,10 +63,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [refreshUser]);
 
   const login = useCallback(async (email: string, password: string) => {
-    await apiLogin(email, password);
+    const tokens = await apiLogin(email, password);
+    if (tokens.force_password_change) {
+      setUser(null);
+      return { forcePasswordChange: true as const, me: null };
+    }
     const me = await fetchMe();
     setUser(me);
-    return me;
+    return { forcePasswordChange: false as const, me };
   }, []);
 
   const logout = useCallback(() => {

@@ -1,17 +1,19 @@
 import {
   apiErrorSchema,
+  changePasswordResponseSchema,
+  createUserResponseSchema,
+  deactivateUserResponseSchema,
   loginResponseSchema,
   meSchema,
+  paginatedAdminUsersSchema,
   refreshResponseSchema,
+  type AdminUser,
   type LoginResponse,
   type Me,
 } from "@/lib/schemas";
 import { getAccessToken, getRefreshToken, setAuthCookies } from "@/lib/cookies";
 
-/** No trailing slash — paths like `/auth/login` must not produce `//api/...`. */
-const API_BASE = (
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1"
-).replace(/\/+$/, "");
+import { API_BASE } from "@/lib/api-base";
 
 export class ApiError extends Error {
   constructor(
@@ -79,6 +81,51 @@ export async function login(email: string, password: string): Promise<LoginRespo
   });
   setAuthCookies(data.access, data.refresh);
   return data;
+}
+
+export async function changePassword(newPassword: string) {
+  return request("/auth/change-password", {
+    method: "POST",
+    body: JSON.stringify({ new_password: newPassword }),
+    schema: changePasswordResponseSchema,
+  });
+}
+
+export type ListUsersParams = {
+  role?: "admin" | "teacher" | "student";
+  status?: "active" | "inactive";
+  page?: number;
+};
+
+export async function listAdminUsers(params: ListUsersParams = {}) {
+  const search = new URLSearchParams();
+  if (params.role) search.set("role", params.role);
+  if (params.status) search.set("status", params.status);
+  if (params.page) search.set("page", String(params.page));
+  const qs = search.toString();
+  return request(`/admin/users${qs ? `?${qs}` : ""}`, {
+    method: "GET",
+    schema: paginatedAdminUsersSchema,
+  });
+}
+
+export async function createAdminUser(body: {
+  name: string;
+  email: string;
+  role: "teacher" | "student";
+}): Promise<AdminUser> {
+  return request("/admin/users", {
+    method: "POST",
+    body: JSON.stringify(body),
+    schema: createUserResponseSchema,
+  });
+}
+
+export async function deactivateAdminUser(userId: string) {
+  return request(`/admin/users/${userId}/deactivate`, {
+    method: "PATCH",
+    schema: deactivateUserResponseSchema,
+  });
 }
 
 export async function refreshAccessToken(): Promise<string | null> {

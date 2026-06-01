@@ -26,7 +26,7 @@ def active_user(school):
         name="Test Teacher",
         role=User.Role.TEACHER,
         school=school,
-        force_password_change=True,
+        force_password_change=False,
         is_active=True,
     )
     return user
@@ -77,7 +77,7 @@ def test_t_w1_02_login_success(api_client, active_user):
     data = response.json()
     assert "access" in data
     assert "refresh" in data
-    assert data["force_password_change"] is True
+    assert data["force_password_change"] is False
 
 
 def test_t_w1_03_login_wrong_password_generic_401(api_client, active_user):

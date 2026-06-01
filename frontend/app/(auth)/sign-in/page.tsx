@@ -19,7 +19,12 @@ function SignInForm() {
     setError(null);
     setSubmitting(true);
     try {
-      const me = await login(email.trim(), password);
+      const result = await login(email.trim(), password);
+      if (result.forcePasswordChange) {
+        router.replace("/change-password");
+        return;
+      }
+      const me = result.me;
       const next = searchParams?.get("next");
       const destination =
         next && next.startsWith(`/${me.role}`) ? next : roleHomePath(me.role);

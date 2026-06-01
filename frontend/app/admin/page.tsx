@@ -1,3 +1,5 @@
-export default function AdminHomePage() {
-  return null;
+import { redirect } from "next/navigation";
+
+export default function AdminIndexPage() {
+  redirect("/admin/users");
 }
