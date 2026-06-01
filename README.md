@@ -2,6 +2,34 @@
 
 Content-less LMS where an AI agent generates the curriculum one lesson at a time. See [`AGENTS.md`](AGENTS.md) for stack decisions, repo layout, and rules.
 
+## Local development (Wave 1)
+
+### Backend
+
+```bash
+cd backend
+cp .env.example .env   # set DJANGO_SECRET_KEY, DATABASE_URL, and CORS_ALLOWED_ORIGINS
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py seed_admin
+python manage.py runserver
+```
+
+API base: `http://localhost:8000/api/v1` — try `POST /auth/login`, `GET /me`.
+
+Async health check: `GET /api/v1/health/async`
+
+### Frontend
+
+```bash
+cd frontend
+cp .env.example .env.local
+npm ci
+npm run dev
+```
+
+Open the frontend dev server at port 3000 (`/sign-in`) and sign in with the seeded admin credentials from `backend/.env`.
+
 ## Build waves
 
 Eight waves, each a vertical slice ending in a **demonstrable, testable outcome**. Each wave's exit criteria must pass before the next wave's first commit.
