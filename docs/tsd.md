@@ -1,6 +1,6 @@
 # Paideia — Technical Specification (PAI-TSD-001 v1.0)
 
-> Auto-generated from the canonical HTML spec. This is the agent-readable copy. If anything here conflicts with a later human edit, the HTML in /spec-source is the visual master; this Markdown is the working reference.
+> Agent-readable technical specification. Canonical decisions in `AGENTS.md` override any stale wording in this document.
 
 ---
 

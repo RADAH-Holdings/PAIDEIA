@@ -48,8 +48,8 @@ Test IDs are traceable: `T-W{n}-{nn}` (unit), `T-SEAM-W{n}` (seam),
 `T-W8-AC{nn}` (acceptance). Every seam test is named in its wave file.
 
 ## How an agent should pick up a wave
-1. Read `../AGENTS.md` (once per session) and this file.
+1. Read [`AGENTS.md`](../AGENTS.md) (once per session) and this file.
 2. Open the wave file; read its Goal, Scope In/Out, and Exit Criteria first.
-3. For each requirement code, look it up in `../docs/fsd.md`; for shapes/architecture, `../docs/tsd.md`; for visuals, `../docs/design-system.md`.
+3. For each requirement code, look it up in [`docs/fsd.md`](../docs/fsd.md); for shapes/architecture, [`docs/tsd.md`](../docs/tsd.md); for visuals, [`docs/design-system.md`](../docs/design-system.md).
 4. Build the deliverables, write the listed tests (by ID), make the seam pass.
 5. Do not start the next wave until every exit criterion is checked off.
