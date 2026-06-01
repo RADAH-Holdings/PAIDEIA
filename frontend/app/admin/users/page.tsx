@@ -7,6 +7,7 @@ import {
   createAdminUser,
   deactivateAdminUser,
   listAdminUsers,
+  resendWelcomeEmail,
   type ListUsersParams,
 } from "@/lib/api";
 import type { AdminUser } from "@/lib/schemas";
@@ -69,6 +70,16 @@ export default function AdminUsersPage() {
       await loadUsers();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not deactivate user.");
+    }
+  }
+
+  async function handleResendWelcome(userId: string) {
+    try {
+      const result = await resendWelcomeEmail(userId);
+      setCreateMessage(result.message);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Could not send welcome email.");
     }
   }
 
@@ -186,14 +197,29 @@ export default function AdminUsersPage() {
                       </span>
                     </td>
                     <td className="py-3">
-                      {u.is_active && u.role !== "admin" ? (
-                        <button
-                          type="button"
-                          onClick={() => void handleDeactivate(u.id)}
-                          className="rounded-btn border border-ink/20 px-2 py-1 text-xs text-ink hover:bg-ink/5"
-                        >
-                          Deactivate
-                        </button>
+                      {u.role !== "admin" ? (
+                        <div className="flex flex-wrap gap-2">
+                          {u.is_active ? (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => void handleResendWelcome(u.id)}
+                                className="rounded-btn border border-ink/20 px-2 py-1 text-xs text-ink hover:bg-ink/5"
+                              >
+                                Resend welcome email
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => void handleDeactivate(u.id)}
+                                className="rounded-btn border border-ink/20 px-2 py-1 text-xs text-ink hover:bg-ink/5"
+                              >
+                                Deactivate
+                              </button>
+                            </>
+                          ) : (
+                            <span className="text-ink/50 text-xs">Inactive</span>
+                          )}
+                        </div>
                       ) : (
                         <span className="text-ink/30">—</span>
                       )}

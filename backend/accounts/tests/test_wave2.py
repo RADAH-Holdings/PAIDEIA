@@ -233,3 +233,53 @@ def test_seam_w2_admin_create_teacher_login_and_change_password(api_client, admi
     assert me.status_code == 200
     assert me.json()["role"] == "teacher"
     assert me.json()["email"] == "seam@a.edu"
+
+
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+def test_resend_welcome_email_sends_new_temp_password(api_client, admin_a, teacher_a):
+    api_client.force_authenticate(user=admin_a)
+    old_password_hash = teacher_a.password
+    url = f"{ADMIN_USERS_URL}/{teacher_a.id}/resend-welcome"
+
+    first = api_client.post(url, format="json")
+    assert first.status_code == 200
+    assert first.json()["message"] == "Welcome email sent."
+    assert len(mail.outbox) == 1
+    assert teacher_a.email in mail.outbox[0].body
+    teacher_a.refresh_from_db()
+    assert teacher_a.password != old_password_hash
+    assert teacher_a.force_password_change is True
+
+    second = api_client.post(url, format="json")
+    assert second.status_code == 200
+    assert len(mail.outbox) == 2
+
+
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+def test_resend_welcome_rejects_inactive_user(api_client, admin_a, teacher_a):
+    teacher_a.is_active = False
+    teacher_a.save(update_fields=["is_active"])
+    api_client.force_authenticate(user=admin_a)
+    response = api_client.post(
+        f"{ADMIN_USERS_URL}/{teacher_a.id}/resend-welcome",
+        format="json",
+    )
+    assert response.status_code == 400
+    assert len(mail.outbox) == 0
+
+
+def test_resend_welcome_forbidden_for_admin_target(api_client, admin_a):
+    other_admin = User.objects.create_user(
+        email="other-admin@a.edu",
+        password="pass",
+        name="Other Admin",
+        role=User.Role.ADMIN,
+        school=admin_a.school,
+        force_password_change=False,
+    )
+    api_client.force_authenticate(user=admin_a)
+    response = api_client.post(
+        f"{ADMIN_USERS_URL}/{other_admin.id}/resend-welcome",
+        format="json",
+    )
+    assert response.status_code == 403

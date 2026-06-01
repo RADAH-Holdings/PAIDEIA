@@ -75,3 +75,7 @@ class DeactivateUserSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     is_active = serializers.BooleanField()
     affected_courses = AffectedCourseSerializer(many=True)
+
+
+class ResendWelcomeSerializer(serializers.Serializer):
+    message = serializers.CharField()

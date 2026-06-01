@@ -14,8 +14,9 @@ from accounts.serializers import (
     AdminUserSerializer,
     CreateUserSerializer,
     DeactivateUserSerializer,
+    ResendWelcomeSerializer,
 )
-from accounts.services import create_school_user, deactivate_user
+from accounts.services import create_school_user, deactivate_user, resend_welcome_email, resend_welcome_email
 
 
 class AdminUserListCreateView(ListAPIView):
@@ -72,3 +73,39 @@ class AdminUserDeactivateView(APIView):
             )
         payload = deactivate_user(admin=request.user, target=target)
         return Response(DeactivateUserSerializer(payload).data, status=status.HTTP_200_OK)
+
+class AdminUserResendWelcomeView(APIView):
+    permission_classes = [IsAuthenticated, ForcePasswordChangePermission, IsAdmin]
+
+    def post(self, request, user_id):
+        target = get_object_or_404(
+            User.objects.filter(school_id=request.user.school_id),
+            pk=user_id,
+        )
+        if target.role not in {User.Role.TEACHER, User.Role.STUDENT}:
+            return error_envelope(
+                code="forbidden_action",
+                message="Welcome email can only be resent for teachers and students.",
+                detail=None,
+                http_status=status.HTTP_403_FORBIDDEN,
+            )
+        if not target.is_active:
+            return error_envelope(
+                code="invalid_request",
+                message="Reactivate the user before resending the welcome email.",
+                detail=None,
+                http_status=status.HTTP_400_BAD_REQUEST,
+            )
+        try:
+            resend_welcome_email(target=target)
+        except Exception:
+            return error_envelope(
+                code="email_failed",
+                message="Could not send the welcome email. Check mail configuration and try again.",
+                detail=None,
+                http_status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        return Response(
+            ResendWelcomeSerializer({"message": "Welcome email sent."}).data,
+            status=status.HTTP_200_OK,
+        )
