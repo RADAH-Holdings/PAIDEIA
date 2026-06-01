@@ -77,3 +77,28 @@ Check **Deploy logs** (runtime) or in SSH run `/opt/venv/bin/python manage.py sh
 `https://<api-host>/api/v1` (no slash at the end)
 
 Wrong: `https://<api-host>/api/v1/`
+
+## Transactional email (ZeptoMail)
+
+Set on the **backend** service (no angle brackets or extra quotes around values):
+
+| Variable | Example |
+|----------|---------|
+| `ZEPTOMAIL_SEND_MAIL_TOKEN` | Paste the Send Mail token from ZeptoMail (raw secret is fine; Paideia adds `Zoho-enczapikey` if missing) |
+| `ZEPTOMAIL_FROM_EMAIL` | `noreply@your-verified-domain.com` — domain must be verified on your ZeptoMail Agent |
+| `ZEPTOMAIL_HOSTED_REGION` | Optional. Default `zeptomail.zoho.com`. Use `zeptomail.zoho.eu` if your Zoho account is EU. |
+| `PAIDEIA_WEB_ORIGIN` | `https://your-frontend.up.railway.app` — no trailing `"` |
+
+**Do not** wrap the token in `<` `>` or `"` in Railway. Delete an empty `JWT_SIGNING_KEY` variable.
+
+After deploy, verify from Railway SSH:
+
+```bash
+/opt/venv/bin/python manage.py send_test_email you@example.com
+```
+
+If ZeptoMail rejects the send, the command exits with an error (previously the API could return 200 while nothing was delivered).
+
+**Resend welcome** sends to the user’s **account email** in the database — update the user’s email in Admin → Users if they should receive mail at a different address.
+
+Check spam and ZeptoMail → Reports for bounces. Rotate the send token if it was ever pasted into chat or logs.
